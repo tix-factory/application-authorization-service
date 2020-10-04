@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TixFactoryVersion>2.0.103</TixFactoryVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TixFactory.Http.Service" Version="$(TixFactoryVersion)" />
+    <PackageReference Include="TixFactory.Logging.Windows" Version="$(TixFactoryVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TixFactory.ApplicationAuthorizations\TixFactory.ApplicationAuthorizations.csproj" />
+  </ItemGroup>
+</Project>

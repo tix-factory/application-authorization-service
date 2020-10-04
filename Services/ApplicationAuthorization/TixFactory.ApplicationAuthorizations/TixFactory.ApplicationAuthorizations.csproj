@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <TixFactoryVersion>2.0.103</TixFactoryVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TixFactory.Logging" Version="$(TixFactoryVersion)" />
+    <PackageReference Include="TixFactory.Operations" Version="$(TixFactoryVersion)" />
+  </ItemGroup>
+</Project>

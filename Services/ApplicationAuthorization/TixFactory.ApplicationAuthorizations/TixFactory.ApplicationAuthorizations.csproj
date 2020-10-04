@@ -7,4 +7,7 @@
     <PackageReference Include="TixFactory.Logging" Version="$(TixFactoryVersion)" />
     <PackageReference Include="TixFactory.Operations" Version="$(TixFactoryVersion)" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\Request\" />
+  </ItemGroup>
 </Project>

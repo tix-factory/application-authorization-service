@@ -26,7 +26,7 @@ namespace TixFactory.ApplicationAuthorization.Service
 		{
 			var httpClient = new HttpClient();
 			var consoleLogger = new ConsoleLogger();
-			return new NetworkLogger(httpClient, consoleLogger, "TFAAS1.TixFactory.ApplicationAuthorization.Service", "tix-factory-monitoring");
+			return new NetworkLogger(httpClient, consoleLogger, "TFAAS1.TixFactory.ApplicationAuthorization.Service", "monitoring.tixfactory.systems");
 		}
 	}
 }

@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using TixFactory.ApplicationAuthorizations;
+using TixFactory.Http.Client;
 using TixFactory.Logging;
+using TixFactory.Logging.Client;
 using TixFactory.Logging.Windows;
 
 namespace TixFactory.ApplicationAuthorization.Service
@@ -26,7 +28,11 @@ namespace TixFactory.ApplicationAuthorization.Service
 		{
 			var eventLogSettings = new WindowsEventLoggerSettings();
 			eventLogSettings.LogName = eventLogSettings.LogSource = "TFAAS1.TixFactory.ApplicationAuthorization.Service";
-			return new WindowsEventLogger(eventLogSettings);
+
+			var windowsLogger = new WindowsEventLogger(eventLogSettings);
+
+			var httpClient = new HttpClient();
+			return new NetworkLogger(httpClient, windowsLogger, eventLogSettings.LogSource, "tix-factory-monitoring");
 		}
 	}
 }

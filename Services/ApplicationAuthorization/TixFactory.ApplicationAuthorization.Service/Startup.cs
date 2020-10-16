@@ -3,7 +3,6 @@ using TixFactory.ApplicationAuthorizations;
 using TixFactory.Http.Client;
 using TixFactory.Logging;
 using TixFactory.Logging.Client;
-using TixFactory.Logging.Windows;
 
 namespace TixFactory.ApplicationAuthorization.Service
 {
@@ -26,13 +25,9 @@ namespace TixFactory.ApplicationAuthorization.Service
 
 		private static ILogger CreateLogger()
 		{
-			var eventLogSettings = new WindowsEventLoggerSettings();
-			eventLogSettings.LogName = eventLogSettings.LogSource = "TFAAS1.TixFactory.ApplicationAuthorization.Service";
-
-			var windowsLogger = new WindowsEventLogger(eventLogSettings);
-
 			var httpClient = new HttpClient();
-			return new NetworkLogger(httpClient, windowsLogger, eventLogSettings.LogSource, "tix-factory-monitoring");
+			var consoleLogger = new ConsoleLogger();
+			return new NetworkLogger(httpClient, consoleLogger, "TFAAS1.TixFactory.ApplicationAuthorization.Service", "tix-factory-monitoring");
 		}
 	}
 }

@@ -6,7 +6,6 @@
   <ItemGroup>
     <PackageReference Include="TixFactory.Http.Service" Version="$(TixFactoryVersion)" />
     <PackageReference Include="TixFactory.Logging.Client" Version="$(TixFactoryVersion)" />
-    <PackageReference Include="TixFactory.Logging.Windows" Version="$(TixFactoryVersion)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TixFactory.ApplicationAuthorizations\TixFactory.ApplicationAuthorizations.csproj" />

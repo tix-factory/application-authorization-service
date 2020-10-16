@@ -7,4 +7,4 @@ COPY ./Application /Application
 WORKDIR Application
 
 # Run the application
-ENTRYPOINT ["dotnet", "TixFactory.ApplicationAuthorizations.Service.dll"]
+ENTRYPOINT ["dotnet", "TixFactory.ApplicationAuthorization.Service.dll"]

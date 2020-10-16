@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace TixFactory.ApplicationAuthorization
 {
 	[DataContract]
-	public class ServiceResult
+	public class OperationResult
 	{
 		[DataMember(Name = "name")]
 		public string Name { get; set; }
 
-		[DataMember(Name = "operations")]
-		public IReadOnlyCollection<OperationResult> Operations { get; set; }
+		[DataMember(Name = "enabled")]
+		public bool Enabled { get; set; }
 
 		[DataMember(Name = "updated")]
 		public DateTime Updated { get; set; }

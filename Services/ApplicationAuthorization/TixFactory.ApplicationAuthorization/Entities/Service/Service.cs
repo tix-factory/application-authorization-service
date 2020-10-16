@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace TixFactory.ApplicationAuthorizations.Entities
+namespace TixFactory.ApplicationAuthorization.Entities
 {
 	[DataContract(Name = "services")]
 	internal class Service

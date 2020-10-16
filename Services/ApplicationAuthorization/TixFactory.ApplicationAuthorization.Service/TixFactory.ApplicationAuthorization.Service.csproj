@@ -8,6 +8,6 @@
     <PackageReference Include="TixFactory.Logging.Client" Version="$(TixFactoryVersion)" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TixFactory.ApplicationAuthorizations\TixFactory.ApplicationAuthorizations.csproj" />
+    <ProjectReference Include="..\TixFactory.ApplicationAuthorization\TixFactory.ApplicationAuthorization.csproj" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TixFactory.ApplicationAuthorizations.Entities
+namespace TixFactory.ApplicationAuthorization.Entities
 {
 	internal interface IServiceEntityFactory
 	{

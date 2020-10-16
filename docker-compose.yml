@@ -1,8 +1,8 @@
 version: "3.7"
 services:
-  application-authorizations-service:
-    image: tixfactory/application-authorizations-service:latest
-    container_name: application-authorizations-service
+  application-authorization-service:
+    image: tixfactory/application-authorization-service:latest
+    container_name: application-authorization-service
     environment:
       APPLICATION_AUTHORIZATIONS_CONNECTION_STRING: "" # ME: Put the actual connection string in the quotes when deploying! 
     networks:

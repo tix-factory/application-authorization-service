@@ -1,8 +1,8 @@
 ﻿using System;
-using TixFactory.ApplicationAuthorizations.Entities;
+using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Operations;
 
-namespace TixFactory.ApplicationAuthorizations
+namespace TixFactory.ApplicationAuthorization
 {
 	internal class GetServiceOperation : IOperation<string, ServiceResult>
 	{

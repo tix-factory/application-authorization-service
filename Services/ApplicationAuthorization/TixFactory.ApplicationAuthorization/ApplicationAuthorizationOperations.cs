@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Data;
 using MySql.Data.MySqlClient;
-using TixFactory.ApplicationAuthorizations.Entities;
+using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Configuration;
 using TixFactory.Logging;
 using TixFactory.Operations;
 
-namespace TixFactory.ApplicationAuthorizations
+namespace TixFactory.ApplicationAuthorization
 {
-	public class ApplicationAuthorizationsOperations : IApplicationAuthorizationsOperations
+	public class ApplicationAuthorizationOperations : IApplicationAuthorizationOperations
 	{
 		private readonly ILazyWithRetry<MySqlConnection> _MySqlConnection;
 
 		public IOperation<string, ServiceResult> GetServiceOperation { get; }
 
-		public ApplicationAuthorizationsOperations(ILogger logger)
+		public ApplicationAuthorizationOperations(ILogger logger)
 		{
 			if (logger == null)
 			{

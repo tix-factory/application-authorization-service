@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace TixFactory.ApplicationAuthorizations
+namespace TixFactory.ApplicationAuthorization
 {
 	[DataContract]
 	public class ServiceResult

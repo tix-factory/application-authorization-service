@@ -6,7 +6,7 @@ using System.Text.Json;
 using MySql.Data.MySqlClient;
 using TixFactory.Configuration;
 
-namespace TixFactory.ApplicationAuthorizations
+namespace TixFactory.ApplicationAuthorization
 {
 	internal class DatabaseConnection : IDatabaseConnection
 	{

@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30517.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.ApplicationAuthorization.Service", "TixFactory.ApplicationAuthorization.Service\TixFactory.ApplicationAuthorization.Service.csproj", "{E3432CDF-B7A3-4D21-922F-E00EF16A191C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.ApplicationAuthorizations", "TixFactory.ApplicationAuthorizations\TixFactory.ApplicationAuthorizations.csproj", "{C4F781A5-97C9-48DD-A5E4-D1FAF68A51F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.ApplicationAuthorization", "TixFactory.ApplicationAuthorization\TixFactory.ApplicationAuthorization.csproj", "{C4F781A5-97C9-48DD-A5E4-D1FAF68A51F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

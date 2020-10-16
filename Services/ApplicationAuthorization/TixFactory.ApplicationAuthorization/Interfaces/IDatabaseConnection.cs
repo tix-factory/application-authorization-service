@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
-namespace TixFactory.ApplicationAuthorizations
+namespace TixFactory.ApplicationAuthorization
 {
 	internal interface IDatabaseConnection
 	{

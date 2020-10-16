@@ -1,8 +1,8 @@
 ﻿using TixFactory.Operations;
 
-namespace TixFactory.ApplicationAuthorizations
+namespace TixFactory.ApplicationAuthorization
 {
-	public interface IApplicationAuthorizationsOperations
+	public interface IApplicationAuthorizationOperations
 	{
 		IOperation<string, ServiceResult> GetServiceOperation { get; }
 	}

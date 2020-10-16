@@ -5,7 +5,7 @@ using System.Threading;
 using MySql.Data.MySqlClient;
 using TixFactory.Configuration;
 
-namespace TixFactory.ApplicationAuthorizations.Entities
+namespace TixFactory.ApplicationAuthorization.Entities
 {
 	internal class ServiceEntityFactory : IServiceEntityFactory
 	{

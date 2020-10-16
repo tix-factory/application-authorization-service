@@ -7,17 +7,17 @@ namespace TixFactory.ApplicationAuthorization.Service
 {
 	public class Startup : TixFactory.Http.Service.Startup
 	{
-		private readonly IApplicationAuthorizationOperations _ApplicationAuthorizationsOperations;
+		private readonly IApplicationAuthorizationOperations _ApplicationAuthorizationOperations;
 
 		public Startup()
 			: base(CreateLogger())
 		{
-			_ApplicationAuthorizationsOperations = new ApplicationAuthorizationOperations(Logger);
+			_ApplicationAuthorizationOperations = new ApplicationAuthorizationOperations(Logger);
 		}
 
 		public override void ConfigureServices(IServiceCollection services)
 		{
-			services.AddTransient(s => _ApplicationAuthorizationsOperations);
+			services.AddTransient(s => _ApplicationAuthorizationOperations);
 
 			base.ConfigureServices(services);
 		}

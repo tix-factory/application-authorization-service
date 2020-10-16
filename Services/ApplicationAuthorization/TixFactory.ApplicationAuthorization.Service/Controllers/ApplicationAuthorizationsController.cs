@@ -5,14 +5,14 @@ using TixFactory.Http.Service;
 namespace TixFactory.ApplicationAuthorization.Service.Controllers
 {
 	[Route("v1/[action]")]
-	public class ApplicationAuthorizationsController
+	public class ApplicationAuthorizationController
 	{
 		private readonly IApplicationAuthorizationOperations _ApplicationAuthorizationOperations;
 		private readonly IOperationExecuter _OperationExecuter;
 
-		public ApplicationAuthorizationsController(IApplicationAuthorizationOperations applicationAuthorizationsOperations, IOperationExecuter operationExecuter)
+		public ApplicationAuthorizationController(IApplicationAuthorizationOperations applicationAuthorizationOperations, IOperationExecuter operationExecuter)
 		{
-			_ApplicationAuthorizationOperations = applicationAuthorizationsOperations ?? throw new ArgumentNullException(nameof(applicationAuthorizationsOperations));
+			_ApplicationAuthorizationOperations = applicationAuthorizationOperations ?? throw new ArgumentNullException(nameof(applicationAuthorizationOperations));
 			_OperationExecuter = operationExecuter ?? throw new ArgumentNullException(nameof(operationExecuter));
 		}
 

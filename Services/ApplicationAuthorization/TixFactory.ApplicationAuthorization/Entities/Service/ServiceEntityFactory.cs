@@ -9,7 +9,10 @@ namespace TixFactory.ApplicationAuthorization.Entities
 {
 	internal class ServiceEntityFactory : IServiceEntityFactory
 	{
+		private const string _InsertServiceStoredProcedure = "InsertService";
 		private const string _GetServicesStoredProcedureName = "GetServices";
+		private const string _UpdateServiceStoredProcedureName = "UpdateService";
+		private const string _DeleteServiceStoredProcedureName = "DeleteService";
 		private const int _ServicesMaxCount = 1000;
 		private static readonly TimeSpan _ServiceCacheTime = TimeSpan.FromMinutes(1);
 		private readonly IDatabaseConnection _DatabaseConnection;
@@ -23,7 +26,14 @@ namespace TixFactory.ApplicationAuthorization.Entities
 
 		public Service CreateService(string name)
 		{
-			throw new System.NotImplementedException();
+			var serviceId = _DatabaseConnection.ExecuteInsertStoredProcedure<long>(_InsertServiceStoredProcedure, new[]
+			{
+				new MySqlParameter("@_Name", name)
+			});
+
+			_Services.Refresh();
+
+			return _Services.Value.First(s => s.Id == serviceId);
 		}
 
 		public IReadOnlyCollection<Service> GetServices()
@@ -38,12 +48,19 @@ namespace TixFactory.ApplicationAuthorization.Entities
 
 		public void UpdateService(Service service)
 		{
-			throw new System.NotImplementedException();
+			_DatabaseConnection.ExecuteWriteStoredProcedure(_UpdateServiceStoredProcedureName, new[]
+			{
+				new MySqlParameter("@_ID", service.Id),
+				new MySqlParameter("@_Name", service.Name)
+			});
 		}
 
 		public void DeleteService(long id)
 		{
-			throw new System.NotImplementedException();
+			_DatabaseConnection.ExecuteWriteStoredProcedure(_DeleteServiceStoredProcedureName, new[]
+			{
+				new MySqlParameter("@_ID", id)
+			});
 		}
 
 		private IReadOnlyCollection<Service> LoadServices()

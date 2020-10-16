@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text.Json;
 using MySql.Data.MySqlClient;
+using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Configuration;
 
 namespace TixFactory.ApplicationAuthorization
@@ -17,6 +18,13 @@ namespace TixFactory.ApplicationAuthorization
 			_ConnectionLazy = connectionLazy ?? throw new ArgumentNullException(nameof(connectionLazy));
 		}
 
+		public T ExecuteInsertStoredProcedure<T>(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters)
+		{
+			var insertResults = ExecuteReadStoredProcedure<InsertResult<T>>(storedProcedureName, mySqlParameters);
+			var insertResult = insertResults.First();
+			return insertResult.Id;
+		}
+
 		public IReadOnlyCollection<T> ExecuteReadStoredProcedure<T>(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters)
 			where T : class
 		{
@@ -24,6 +32,15 @@ namespace TixFactory.ApplicationAuthorization
 			command.CommandType = CommandType.StoredProcedure;
 			command.Parameters.AddRange(mySqlParameters.ToArray());
 			return ExecuteCommand<T>(command);
+		}
+
+		public int ExecuteWriteStoredProcedure(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters)
+		{
+			var command = new MySqlCommand(storedProcedureName, _ConnectionLazy.Value);
+			command.CommandType = CommandType.StoredProcedure;
+			command.Parameters.AddRange(mySqlParameters.ToArray());
+
+			return command.ExecuteNonQuery();
 		}
 
 		private IReadOnlyCollection<T> ExecuteCommand<T>(MySqlCommand command)

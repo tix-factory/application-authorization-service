@@ -11,11 +11,19 @@ namespace TixFactory.ApplicationAuthorization
 {
 	internal class DatabaseConnection : IDatabaseConnection
 	{
+		private readonly JsonSerializerOptions _JsonSerializerOptions;
 		private readonly ILazyWithRetry<MySqlConnection> _ConnectionLazy;
 
 		public DatabaseConnection(ILazyWithRetry<MySqlConnection> connectionLazy)
 		{
 			_ConnectionLazy = connectionLazy ?? throw new ArgumentNullException(nameof(connectionLazy));
+
+			var jsonSerializerOptions = _JsonSerializerOptions = new JsonSerializerOptions
+			{
+				PropertyNameCaseInsensitive = true
+			};
+
+			jsonSerializerOptions.Converters.Add(new BooleanJsonConverter());
 		}
 
 		public T ExecuteInsertStoredProcedure<T>(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters)
@@ -59,7 +67,7 @@ namespace TixFactory.ApplicationAuthorization
 
 				// TODO: Is there a better way to convert reader object -> T?
 				var serializedRow = JsonSerializer.Serialize(row);
-				var deserializedRow = JsonSerializer.Deserialize<T>(serializedRow);
+				var deserializedRow = JsonSerializer.Deserialize<T>(serializedRow, _JsonSerializerOptions);
 
 				if (deserializedRow != default(T))
 				{

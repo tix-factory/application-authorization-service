@@ -32,7 +32,7 @@ namespace TixFactory.ApplicationAuthorization
 			var serviceEntityFactory = _ServiceEntityFactory = new ServiceEntityFactory(databaseConnection);
 			var operationEntityFactory = _OperationEntityFactory = new OperationEntityFactory(databaseConnection);
 
-			GetServiceOperation = new GetServiceOperation(serviceEntityFactory);
+			GetServiceOperation = new GetServiceOperation(serviceEntityFactory, operationEntityFactory);
 
 			ThreadPool.QueueUserWorkItem(SelfRegistration);
 		}

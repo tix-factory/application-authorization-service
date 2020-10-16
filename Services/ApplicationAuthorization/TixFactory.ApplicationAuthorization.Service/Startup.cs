@@ -12,7 +12,7 @@ namespace TixFactory.ApplicationAuthorization.Service
 		public Startup()
 			: base(CreateLogger())
 		{
-			_ApplicationAuthorizationOperations = new ApplicationAuthorizationOperations(Logger);
+			_ApplicationAuthorizationOperations = new ApplicationAuthorizationOperations(Logger, ApplicationContext);
 		}
 
 		public override void ConfigureServices(IServiceCollection services)

@@ -29,6 +29,8 @@ namespace TixFactory.ApplicationAuthorization
 
 		public IOperation<string, ApplicationResult> GetApplicationOperation { get; }
 
+		public IOperation<RegisterApplicationRequest, EmptyResult> RegisterApplicationOperation { get; }
+
 		public IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 
 		public ApplicationAuthorizationOperations(ILogger logger, IApplicationContext applicationContext)
@@ -47,6 +49,7 @@ namespace TixFactory.ApplicationAuthorization
 			var applicationKeyValidator = ApplicationKeyValidator = new ApplicationKeyValidator(applicationEntityFactory, operationEntityFactory, applicationKeyEntityFactory, applicationOperationAuthorizationEntityFactory);
 
 			GetApplicationOperation = new GetApplicationOperation(applicationEntityFactory, operationEntityFactory);
+			RegisterApplicationOperation = new RegisterApplicationOperation(applicationEntityFactory);
 			GetAuthorizedOperationsOperation = new GetAuthorizedOperationsOperation(applicationEntityFactory, applicationKeyEntityFactory, applicationKeyValidator);
 
 			ThreadPool.QueueUserWorkItem(SelfRegistration);

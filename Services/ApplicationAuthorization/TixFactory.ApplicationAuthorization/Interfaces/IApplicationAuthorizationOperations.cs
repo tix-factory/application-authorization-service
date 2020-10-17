@@ -9,6 +9,8 @@ namespace TixFactory.ApplicationAuthorization
 
 		IOperation<string, ApplicationResult> GetApplicationOperation { get; }
 
+		IOperation<RegisterApplicationRequest, EmptyResult> RegisterApplicationOperation { get; }
+
 		IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 	}
 }

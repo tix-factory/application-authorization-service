@@ -12,6 +12,9 @@ namespace TixFactory.ApplicationAuthorization.Entities
 		[DataMember(Name = "ApplicationID")]
 		public long ApplicationId { get; set; }
 
+		[DataMember(Name = "Name")]
+		public string Name { get; set; }
+
 		[DataMember(Name = "KeyHash")]
 		public string KeyHash { get; set; }
 

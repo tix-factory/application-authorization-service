@@ -15,6 +15,7 @@ namespace TixFactory.ApplicationAuthorization
 	public class ApplicationAuthorizationOperations : IApplicationAuthorizationOperations
 	{
 		private const string _OperationNameSuffix = "Operation";
+		private const string _SetupKeyName = "Application Setup";
 
 		private readonly ILogger _Logger;
 		private readonly IApplicationContext _ApplicationContext;
@@ -28,6 +29,18 @@ namespace TixFactory.ApplicationAuthorization
 		public IApplicationKeyValidator ApplicationKeyValidator { get; }
 
 		public IOperation<string, ApplicationResult> GetApplicationOperation { get; }
+
+		public IOperation<RegisterApplicationRequest, EmptyResult> RegisterApplicationOperation { get; }
+
+		public IOperation<RegisterOperationRequest, EmptyResult> RegisterOperationOperation { get; }
+
+		public IOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
+
+		public IOperation<CreateApplicationKeyRequest, Guid> CreateApplicationKeyOperation { get; }
+
+		public IOperation<DeleteApplicationKeyRequest, EmptyResult> DeleteApplicationKeyOperation { get; }
+
+		public IOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
 
 		public IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 
@@ -47,6 +60,15 @@ namespace TixFactory.ApplicationAuthorization
 			var applicationKeyValidator = ApplicationKeyValidator = new ApplicationKeyValidator(applicationEntityFactory, operationEntityFactory, applicationKeyEntityFactory, applicationOperationAuthorizationEntityFactory);
 
 			GetApplicationOperation = new GetApplicationOperation(applicationEntityFactory, operationEntityFactory);
+
+			RegisterApplicationOperation = new RegisterApplicationOperation(applicationEntityFactory);
+
+			RegisterOperationOperation = new RegisterOperationOperation(applicationEntityFactory, operationEntityFactory);
+			ToggleOperationEnabledOperation = new ToggleOperationEnabledOperation(applicationEntityFactory, operationEntityFactory);
+
+			CreateApplicationKeyOperation = new CreateApplicationKeyOperation(applicationEntityFactory, applicationKeyEntityFactory);
+			DeleteApplicationKeyOperation = new DeleteApplicationKeyOperation(applicationEntityFactory, applicationKeyEntityFactory);
+			ToggleApplicationKeyEnabledOperation = new ToggleApplicationKeyEnabledOperation(applicationEntityFactory, applicationKeyEntityFactory);
 			GetAuthorizedOperationsOperation = new GetAuthorizedOperationsOperation(applicationEntityFactory, applicationKeyEntityFactory, applicationKeyValidator);
 
 			ThreadPool.QueueUserWorkItem(SelfRegistration);
@@ -87,9 +109,9 @@ namespace TixFactory.ApplicationAuthorization
 				if (setupKey == null)
 				{
 					var keyGuid = Guid.NewGuid();
-					_ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, keyGuid);
+					setupKey = _ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, _SetupKeyName, keyGuid);
 
-					Console.WriteLine($"Setup ApiKey: {keyGuid}");
+					Console.WriteLine($"Setup ApiKey ({setupKey.Name}): {keyGuid}");
 				}
 
 				// Make sure the ApplicationAuthorization service has access to itself.

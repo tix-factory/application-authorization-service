@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using TixFactory.Http.Client;
 using TixFactory.Logging;
@@ -20,6 +21,13 @@ namespace TixFactory.ApplicationAuthorization.Service
 			services.AddTransient(s => _ApplicationAuthorizationOperations);
 
 			base.ConfigureServices(services);
+		}
+
+		protected override void ConfigureMvc(MvcOptions options)
+		{
+			options.Filters.Add(new ValidateApiKeyAttribute(ApplicationContext, _ApplicationAuthorizationOperations.ApplicationKeyValidator));
+
+			base.ConfigureMvc(options);
 		}
 
 		private static ILogger CreateLogger()

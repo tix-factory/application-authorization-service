@@ -63,7 +63,7 @@ namespace TixFactory.ApplicationAuthorization.Entities
 				new MySqlParameter("@_KeyHash", keyHash)
 			});
 
-			_ApplicationKeysByKeyHash[keyHash] = applicaitonKey = applicationKeys.First();
+			_ApplicationKeysByKeyHash[keyHash] = applicaitonKey = applicationKeys.FirstOrDefault();
 			return applicaitonKey;
 		}
 

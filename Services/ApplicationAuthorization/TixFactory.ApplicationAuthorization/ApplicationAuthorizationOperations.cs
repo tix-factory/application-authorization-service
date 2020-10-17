@@ -31,6 +31,8 @@ namespace TixFactory.ApplicationAuthorization
 			var databaseConnection = new DatabaseConnection(mySqlConnection);
 			var applicationEntityFactory = _ApplicationEntityFactory = new ApplicationEntityFactory(databaseConnection);
 			var operationEntityFactory = _OperationEntityFactory = new OperationEntityFactory(databaseConnection);
+			var applicationKeyEntityFactory = new ApplicationKeyEntityFactory(databaseConnection);
+			var applicationOperationAuthorizationEntityFactory = new ApplicationOperationAuthorizationEntityFactory(databaseConnection);
 
 			GetApplicationOperation = new GetApplicationOperation(applicationEntityFactory, operationEntityFactory);
 

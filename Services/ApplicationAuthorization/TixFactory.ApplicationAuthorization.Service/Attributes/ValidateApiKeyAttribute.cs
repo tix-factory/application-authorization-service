@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -28,9 +30,9 @@ namespace TixFactory.ApplicationAuthorization.Service
 
 		public override void OnActionExecuting(ActionExecutingContext actionContext)
 		{
-			if (!TryValidateController(actionContext))
+			if (!ShouldValidateApiKey(actionContext))
 			{
-				// Controller does not require authorization.
+				// Action does not require authorization.
 				return;
 			}
 
@@ -38,6 +40,25 @@ namespace TixFactory.ApplicationAuthorization.Service
 			{
 				actionContext.Result = new UnauthorizedResult();
 			}
+		}
+
+		private bool ShouldValidateApiKey(ActionExecutingContext actionContext)
+		{
+			if (!_AuthenticatedControllerTypes.Contains(actionContext.Controller.GetType()))
+			{
+				// Controller does not require ApiKey validation.
+				return false;
+			}
+
+			if (actionContext.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+			{
+				var allowAnonymousAttributes = controllerActionDescriptor.MethodInfo.GetCustomAttributes(
+					attributeType: typeof(AllowAnonymousAttribute),
+					inherit: true);
+				return !allowAnonymousAttributes.Any();
+			}
+
+			return true;
 		}
 
 		private bool TryValidateApiKey(ActionExecutingContext actionContext)
@@ -51,11 +72,6 @@ namespace TixFactory.ApplicationAuthorization.Service
 			}
 
 			return false;
-		}
-
-		private bool TryValidateController(ActionExecutingContext actionContext)
-		{
-			return _AuthenticatedControllerTypes.Contains(actionContext.Controller.GetType());
 		}
 	}
 }

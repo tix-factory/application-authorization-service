@@ -5,6 +5,14 @@ using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
+	/// <summary>
+	/// Retrieves names of operations authorized for a target application, for the given ApiKey.
+	/// </summary>
+	/// <remarks>
+	/// As application (specified by ApiKey header, <see cref="GetAuthorizedOperationsRequest.TargetApplicationKey"/>),
+	/// I have received a request with this ApiKey: <see cref="GetAuthorizedOperationsRequest.ApiKey"/>.
+	/// Please tell me which operations the ApiKey I have received has access to.
+	/// </remarks>
 	internal class GetAuthorizedOperationsOperation : IOperation<GetAuthorizedOperationsRequest, ICollection<string>>
 	{
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;

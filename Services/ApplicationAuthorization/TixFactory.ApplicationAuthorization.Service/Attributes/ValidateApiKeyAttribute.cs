@@ -52,7 +52,9 @@ namespace TixFactory.ApplicationAuthorization.Service
 
 			if (actionContext.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
 			{
-				var allowAnonymousAttributes = controllerActionDescriptor.MethodInfo.GetCustomAttributes(attributeType: typeof(AllowAnonymousAttribute), inherit: true);
+				var allowAnonymousAttributes = controllerActionDescriptor.MethodInfo.GetCustomAttributes(
+					attributeType: typeof(AllowAnonymousAttribute),
+					inherit: true);
 				return !allowAnonymousAttributes.Any();
 			}
 

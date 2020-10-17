@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using MySql.Data.MySqlClient;
 using TixFactory.Collections;
 
@@ -17,16 +16,16 @@ namespace TixFactory.ApplicationAuthorization.Entities
 		private const int _ApplicationKeysMaxCount = 1000;
 		private static readonly TimeSpan _ApplicationKeyCacheTime = TimeSpan.FromMinutes(1);
 		private readonly IDatabaseConnection _DatabaseConnection;
+		private readonly IKeyHasher _KeyHasher;
 		private readonly ExpirableDictionary<long, IReadOnlyCollection<ApplicationKey>> _ApplicationKeysByApplicationId;
 		private readonly ExpirableDictionary<string, ApplicationKey> _ApplicationKeysByKeyHash;
-		private readonly HashAlgorithm _SHA256;
 
-		public ApplicationKeyEntityFactory(IDatabaseConnection databaseConnection)
+		public ApplicationKeyEntityFactory(IDatabaseConnection databaseConnection, IKeyHasher keyHasher)
 		{
 			_DatabaseConnection = databaseConnection ?? throw new ArgumentNullException(nameof(databaseConnection));
+			_KeyHasher = keyHasher ?? throw new ArgumentNullException(nameof(keyHasher));
 			_ApplicationKeysByApplicationId = new ExpirableDictionary<long, IReadOnlyCollection<ApplicationKey>>(_ApplicationKeyCacheTime, ExpirationPolicy.RenewOnWrite);
 			_ApplicationKeysByKeyHash = new ExpirableDictionary<string, ApplicationKey>(_ApplicationKeyCacheTime, ExpirationPolicy.RenewOnWrite);
-			_SHA256 = SHA256.Create();
 		}
 
 		public ApplicationKey CreateApplicationKey(long applicationId, Guid key)
@@ -37,7 +36,7 @@ namespace TixFactory.ApplicationAuthorization.Entities
 				throw new ApplicationException($"Cannot create more than {_ApplicationKeysMaxCount} application keys per application.");
 			}
 
-			var keyHash = HashKey(key);
+			var keyHash = _KeyHasher.HashKey(key);
 			var applicationKeyId = _DatabaseConnection.ExecuteInsertStoredProcedure<long>(_InsertApplicationKeyStoredProcedure, new[]
 			{
 				new MySqlParameter("@_ApplicationID", applicationId),
@@ -53,7 +52,7 @@ namespace TixFactory.ApplicationAuthorization.Entities
 
 		public ApplicationKey GetApplicationKey(Guid key)
 		{
-			var keyHash = HashKey(key);
+			var keyHash = _KeyHasher.HashKey(key);
 			if (_ApplicationKeysByKeyHash.TryGetValue(keyHash, out var applicaitonKey))
 			{
 				return applicaitonKey;
@@ -101,19 +100,6 @@ namespace TixFactory.ApplicationAuthorization.Entities
 			{
 				new MySqlParameter("@_ID", id)
 			});
-		}
-
-		private string HashKey(Guid key)
-		{
-			var keyHash = string.Empty;
-			var sha256Bytes = _SHA256.ComputeHash(key.ToByteArray());
-
-			foreach (var b in sha256Bytes)
-			{
-				keyHash += $"{b:X2}";
-			}
-
-			return keyHash;
 		}
 	}
 }

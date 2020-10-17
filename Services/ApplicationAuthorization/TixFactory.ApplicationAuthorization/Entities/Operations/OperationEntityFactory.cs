@@ -25,6 +25,12 @@ namespace TixFactory.ApplicationAuthorization.Entities
 
 		public Operation CreateOperation(long applicationId, string name)
 		{
+			var operations = GetOperations(applicationId);
+			if (operations.Count >= _OperationsMaxCount)
+			{
+				throw new ApplicationException($"Cannot create more than {_OperationsMaxCount} operations per application.");
+			}
+
 			var operationId = _DatabaseConnection.ExecuteInsertStoredProcedure<long>(_InsertOperationStoredProcedureName, new[]
 			{
 				new MySqlParameter("@_ApplicationID", applicationId),
@@ -34,7 +40,7 @@ namespace TixFactory.ApplicationAuthorization.Entities
 
 			_OperationsByApplicationId.Remove(applicationId);
 
-			var operations = GetOperations(applicationId);
+			operations = GetOperations(applicationId);
 			return operations.First(o => o.Id == operationId);
 		}
 

@@ -31,6 +31,12 @@ namespace TixFactory.ApplicationAuthorization.Entities
 
 		public ApplicationKey CreateApplicationKey(long applicationId, Guid key)
 		{
+			var applicationKeys = GetApplicationKeysByApplicationId(applicationId);
+			if (applicationKeys.Count >= _ApplicationKeysMaxCount)
+			{
+				throw new ApplicationException($"Cannot create more than {_ApplicationKeysMaxCount} application keys per application.");
+			}
+
 			var keyHash = HashKey(key);
 			var applicationKeyId = _DatabaseConnection.ExecuteInsertStoredProcedure<long>(_InsertApplicationKeyStoredProcedure, new[]
 			{
@@ -41,7 +47,7 @@ namespace TixFactory.ApplicationAuthorization.Entities
 
 			_ApplicationKeysByApplicationId.Remove(applicationId);
 
-			var applicationKeys = GetApplicationKeysByApplicationId(applicationId);
+			applicationKeys = GetApplicationKeysByApplicationId(applicationId);
 			return applicationKeys.First(k => k.Id == applicationKeyId);
 		}
 

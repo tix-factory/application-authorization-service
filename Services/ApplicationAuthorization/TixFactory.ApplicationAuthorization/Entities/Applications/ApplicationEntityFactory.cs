@@ -26,6 +26,12 @@ namespace TixFactory.ApplicationAuthorization.Entities
 
 		public Application CreateApplication(string name)
 		{
+			var applications = GetApplications();
+			if (applications.Count >= _ApplicationsMaxCount)
+			{
+				throw new ApplicationException($"Cannot create more than {_ApplicationsMaxCount} applications.");
+			}
+
 			var applicationId = _DatabaseConnection.ExecuteInsertStoredProcedure<long>(_InsertApplicationStoredProcedure, new[]
 			{
 				new MySqlParameter("@_Name", name)

@@ -28,6 +28,12 @@ namespace TixFactory.ApplicationAuthorization.Entities
 
 		public ApplicationOperationAuthorization CreateApplicationOperationAuthorization(long applicationId, long operationId)
 		{
+			var applicationOperationAuthorizations = GetApplicationOperationAuthorizationsByApplicationId(applicationId);
+			if (applicationOperationAuthorizations.Count >= _ApplicationOperationAuthorizationsMaxCount)
+			{
+				throw new ApplicationException($"Cannot create more than {_ApplicationOperationAuthorizationsMaxCount} authorizations per application.");
+			}
+
 			var applicationOperationAuthorizationId = _DatabaseConnection.ExecuteInsertStoredProcedure<long>(_InsertApplicationOperationAuthorizationStoredProcedure, new[]
 			{
 				new MySqlParameter("@_ApplicationID", applicationId),
@@ -37,7 +43,7 @@ namespace TixFactory.ApplicationAuthorization.Entities
 			_ApplicationOperationAuthorizationsByApplicationId.Remove(applicationId);
 			_ApplicationOperationAuthorizationsByOperationId.Remove(operationId);
 
-			var applicationOperationAuthorizations = GetApplicationOperationAuthorizationsByApplicationId(applicationId);
+			applicationOperationAuthorizations = GetApplicationOperationAuthorizationsByApplicationId(applicationId);
 			return applicationOperationAuthorizations.First(a => a.Id == applicationOperationAuthorizationId);
 		}
 

@@ -41,7 +41,7 @@ namespace TixFactory.ApplicationAuthorization.Entities
 			{
 				new MySqlParameter("@_ApplicationID", applicationId),
 				new MySqlParameter("@_KeyHash", keyHash),
-				new MySqlParameter("@_Enabled", false)
+				new MySqlParameter("@_Enabled", true)
 			});
 
 			_ApplicationKeysByApplicationId.Remove(applicationId);

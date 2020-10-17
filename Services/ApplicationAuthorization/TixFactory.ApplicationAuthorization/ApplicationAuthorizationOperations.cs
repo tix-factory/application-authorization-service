@@ -76,10 +76,15 @@ namespace TixFactory.ApplicationAuthorization
 						var operation = _OperationEntityFactory.GetOperationByName(application.Id, operationName);
 						if (operation == null)
 						{
-							_OperationEntityFactory.CreateOperation(application.Id, operationName);
+							operation = _OperationEntityFactory.CreateOperation(application.Id, operationName);
+						}
+
+						if (!operation.Enabled)
+						{
+							operation.Enabled = true;
+							_OperationEntityFactory.UpdateOperation(operation);
 						}
 					}
-					
 				}
 			}
 			catch (Exception e)

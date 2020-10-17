@@ -3,8 +3,8 @@ using System.Runtime.Serialization;
 
 namespace TixFactory.ApplicationAuthorization.Entities
 {
-	[DataContract(Name = "services")]
-	internal class Service
+	[DataContract(Name = "applications")]
+	internal class Application
 	{
 		[DataMember(Name = "ID")]
 		public long Id { get; set; }

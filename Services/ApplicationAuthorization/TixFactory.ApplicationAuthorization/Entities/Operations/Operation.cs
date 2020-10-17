@@ -9,8 +9,8 @@ namespace TixFactory.ApplicationAuthorization.Entities
 		[DataMember(Name = "ID")]
 		public long Id { get; set; }
 
-		[DataMember(Name = "ServiceID")]
-		public long ServiceId { get; set; }
+		[DataMember(Name = "ApplicationID")]
+		public long ApplicationId { get; set; }
 
 		[DataMember(Name = "Name")]
 		public string Name { get; set; }

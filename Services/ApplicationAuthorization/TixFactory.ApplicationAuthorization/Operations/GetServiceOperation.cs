@@ -5,29 +5,29 @@ using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
-	internal class GetServiceOperation : IOperation<string, ServiceResult>
+	internal class GetApplicationOperation : IOperation<string, ApplicationResult>
 	{
-		private readonly IServiceEntityFactory _ServiceEntityFactory;
+		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IOperationEntityFactory _OperationEntityFactory;
 
-		public GetServiceOperation(IServiceEntityFactory serviceEntityFactory, IOperationEntityFactory operationEntityFactory)
+		public GetApplicationOperation(IApplicationEntityFactory applicationEntityFactory, IOperationEntityFactory operationEntityFactory)
 		{
-			_ServiceEntityFactory = serviceEntityFactory ?? throw new ArgumentNullException(nameof(serviceEntityFactory));
+			_ApplicationEntityFactory = applicationEntityFactory ?? throw new ArgumentNullException(nameof(applicationEntityFactory));
 			_OperationEntityFactory = operationEntityFactory ?? throw new ArgumentNullException(nameof(operationEntityFactory));
 		}
 
-		public (ServiceResult output, OperationError error) Execute(string serviceName)
+		public (ApplicationResult output, OperationError error) Execute(string applicationName)
 		{
-			var service = _ServiceEntityFactory.GetServiceByName(serviceName);
+			var application = _ApplicationEntityFactory.GetApplicationByName(applicationName);
 
-			ServiceResult result = null;
-			if (service != null)
+			ApplicationResult result = null;
+			if (application != null)
 			{
-				var operations = _OperationEntityFactory.GetOperations(service.Id);
+				var operations = _OperationEntityFactory.GetOperations(application.Id);
 
-				result = new ServiceResult
+				result = new ApplicationResult
 				{
-					Name = service.Name,
+					Name = application.Name,
 					Operations = operations.Select(o => new OperationResult
 					{
 						Name = o.Name,
@@ -35,8 +35,8 @@ namespace TixFactory.ApplicationAuthorization
 						Created = o.Created,
 						Updated = o.Updated
 					}).ToArray(),
-					Created = service.Created,
-					Updated = service.Updated
+					Created = application.Created,
+					Updated = application.Updated
 				};
 			}
 

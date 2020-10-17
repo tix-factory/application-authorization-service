@@ -17,9 +17,9 @@ namespace TixFactory.ApplicationAuthorization.Service.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult GetService([FromBody] RequestPayload<string> request)
+		public IActionResult GetApplication([FromBody] RequestPayload<string> request)
 		{
-			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.GetServiceOperation, request.Data);
+			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.GetApplicationOperation, request.Data);
 		}
 	}
 }

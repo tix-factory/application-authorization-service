@@ -15,6 +15,8 @@ namespace TixFactory.ApplicationAuthorization
 
 		IOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
 
+		IOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
+
 		IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 	}
 }

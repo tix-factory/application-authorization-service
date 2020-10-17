@@ -15,6 +15,7 @@ namespace TixFactory.ApplicationAuthorization
 	public class ApplicationAuthorizationOperations : IApplicationAuthorizationOperations
 	{
 		private const string _OperationNameSuffix = "Operation";
+		private const string _SetupKeyName = "Application Setup";
 
 		private readonly ILogger _Logger;
 		private readonly IApplicationContext _ApplicationContext;
@@ -99,9 +100,9 @@ namespace TixFactory.ApplicationAuthorization
 				if (setupKey == null)
 				{
 					var keyGuid = Guid.NewGuid();
-					_ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, keyGuid);
+					setupKey = _ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, _SetupKeyName, keyGuid);
 
-					Console.WriteLine($"Setup ApiKey: {keyGuid}");
+					Console.WriteLine($"Setup ApiKey ({setupKey.Name}): {keyGuid}");
 				}
 
 				// Make sure the ApplicationAuthorization service has access to itself.

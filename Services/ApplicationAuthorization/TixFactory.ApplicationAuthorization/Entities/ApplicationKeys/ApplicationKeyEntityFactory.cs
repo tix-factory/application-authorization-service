@@ -28,7 +28,7 @@ namespace TixFactory.ApplicationAuthorization.Entities
 			_ApplicationKeysByKeyHash = new ExpirableDictionary<string, ApplicationKey>(_ApplicationKeyCacheTime, ExpirationPolicy.RenewOnWrite);
 		}
 
-		public ApplicationKey CreateApplicationKey(long applicationId, Guid key)
+		public ApplicationKey CreateApplicationKey(long applicationId, string name, Guid key)
 		{
 			var applicationKeys = GetApplicationKeysByApplicationId(applicationId);
 			if (applicationKeys.Count >= _ApplicationKeysMaxCount)
@@ -40,6 +40,7 @@ namespace TixFactory.ApplicationAuthorization.Entities
 			var applicationKeyId = _DatabaseConnection.ExecuteInsertStoredProcedure<long>(_InsertApplicationKeyStoredProcedure, new[]
 			{
 				new MySqlParameter("@_ApplicationID", applicationId),
+				new MySqlParameter("@_Name", name),
 				new MySqlParameter("@_KeyHash", keyHash),
 				new MySqlParameter("@_Enabled", true)
 			});
@@ -67,6 +68,12 @@ namespace TixFactory.ApplicationAuthorization.Entities
 			return applicaitonKey;
 		}
 
+		public ApplicationKey GetApplicationKeyByApplicationIdAndName(long applicationId, string name)
+		{
+			var applicationKeys = GetApplicationKeysByApplicationId(applicationId);
+			return applicationKeys.FirstOrDefault(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase));
+		}
+
 		public IReadOnlyCollection<ApplicationKey> GetApplicationKeysByApplicationId(long applicationId)
 		{
 			if (_ApplicationKeysByApplicationId.TryGetValue(applicationId, out var applicationKeys))
@@ -89,6 +96,7 @@ namespace TixFactory.ApplicationAuthorization.Entities
 			{
 				new MySqlParameter("@_ID", applicationKey.Id),
 				new MySqlParameter("@_ApplicationID", applicationKey.ApplicationId),
+				new MySqlParameter("@_Name", applicationKey.Name),
 				new MySqlParameter("@_KeyHash", applicationKey.KeyHash),
 				new MySqlParameter("@_Enabled", applicationKey.Enabled)
 			});

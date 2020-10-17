@@ -18,6 +18,8 @@ namespace TixFactory.ApplicationAuthorization
 
 		IOperation<CreateApplicationKeyRequest, Guid> CreateApplicationKeyOperation { get; }
 
+		IOperation<DeleteApplicationKeyRequest, EmptyResult> DeleteApplicationKeyOperation { get; }
+
 		IOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
 
 		IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }

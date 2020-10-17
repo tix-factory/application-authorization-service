@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS `application-keys` (
 	`Created` DATETIME NOT NULL,
 
 	PRIMARY KEY (`ID`),
+	CONSTRAINT `UC_KeyHash` UNIQUE(`KeyHash`),
 	FOREIGN KEY `FK_ApplicationKeys_Applications_ApplicationID` (`ApplicationID`) REFERENCES `applications`(`ID`) ON DELETE CASCADE
 );

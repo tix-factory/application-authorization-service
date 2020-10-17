@@ -5,5 +5,7 @@ CREATE TABLE IF NOT EXISTS `applications` (
 	`Name` VARCHAR(100) NOT NULL,
 	`Updated` DATETIME NOT NULL,
 	`Created` DATETIME NOT NULL,
-	PRIMARY KEY (`ID`)
+
+	PRIMARY KEY (`ID`),
+	CONSTRAINT `UC_Name` UNIQUE(`Name`)
 );

@@ -1,10 +1,10 @@
 DELIMITER $$
 USE `application-authorizations`$$
-CREATE PROCEDURE `InsertService`(
+CREATE PROCEDURE `InsertApplication`(
 	IN _Name VARBINARY(50)
 )
 BEGIN
-	INSERT INTO `application-authorizations`.`services`
+	INSERT INTO `application-authorizations`.`applications`
 	(
 		`Name`,
 		`Created`,

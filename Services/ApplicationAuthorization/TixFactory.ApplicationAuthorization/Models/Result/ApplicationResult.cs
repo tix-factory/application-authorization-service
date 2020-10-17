@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace TixFactory.ApplicationAuthorization
 {
 	[DataContract]
-	public class ServiceResult
+	public class ApplicationResult
 	{
 		[DataMember(Name = "name")]
 		public string Name { get; set; }

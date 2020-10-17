@@ -3,17 +3,17 @@ using System.Runtime.Serialization;
 
 namespace TixFactory.ApplicationAuthorization.Entities
 {
-	[DataContract(Name = "operations")]
-	internal class Operation
+	[DataContract(Name = "applications-keys")]
+	internal class ApplicationKey
 	{
 		[DataMember(Name = "ID")]
 		public long Id { get; set; }
 
-		[DataMember(Name = "ServiceID")]
-		public long ServiceId { get; set; }
+		[DataMember(Name = "ApplicationID")]
+		public long ApplicationId { get; set; }
 
-		[DataMember(Name = "Name")]
-		public string Name { get; set; }
+		[DataMember(Name = "KeyHash")]
+		public string KeyHash { get; set; }
 
 		[DataMember(Name = "enabled")]
 		public bool Enabled { get; set; }

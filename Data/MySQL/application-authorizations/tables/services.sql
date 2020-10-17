@@ -1,9 +1,0 @@
-USE `application-authorizations`;
-
-CREATE TABLE IF NOT EXISTS `services` (
-	`ID` BIGINT NOT NULL AUTO_INCREMENT,
-	`Name` VARCHAR(100) NOT NULL,
-	`Updated` DATETIME NOT NULL,
-	`Created` DATETIME NOT NULL,
-	PRIMARY KEY (`ID`)
-);

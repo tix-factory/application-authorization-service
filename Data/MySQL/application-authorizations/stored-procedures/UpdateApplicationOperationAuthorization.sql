@@ -1,17 +1,15 @@
 DELIMITER $$
 USE `application-authorizations`$$
-CREATE PROCEDURE `UpdateOperation`(
+CREATE PROCEDURE `UpdateApplicationOperationAuthorization`(
 	IN _ApplicationID BIGINT,
-	IN _Name VARBINARY(50),
-	IN _Enabled BIT,
+	IN _OperationID BIGINT,
 	IN _ID BIGINT
 )
 BEGIN
-	UPDATE `application-authorizations`.`operations`
+	UPDATE `application-authorizations`.`application-operation-authorizations`
 	SET
 		`ApplicationID` = _ApplicationID,
-		`Name` = _Name,
-		`Enabled` = _Enabled,
+		`OperationID` = _OperationID,
 		`Updated` = UTC_Timestamp()
 	WHERE (`ID` = _ID)
 	LIMIT 1;

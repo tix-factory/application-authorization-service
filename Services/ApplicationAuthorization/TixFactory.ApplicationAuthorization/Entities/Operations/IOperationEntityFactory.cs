@@ -4,11 +4,11 @@ namespace TixFactory.ApplicationAuthorization.Entities
 {
 	internal interface IOperationEntityFactory
 	{
-		Operation CreateOperation(long serviceId, string name);
+		Operation CreateOperation(long applicationId, string name);
 
-		IReadOnlyCollection<Operation> GetOperations(long serviceId);
+		IReadOnlyCollection<Operation> GetOperations(long applicationId);
 
-		Operation GetOperationByName(long serviceId, string name);
+		Operation GetOperationByName(long applicationId, string name);
 
 		void UpdateOperation(Operation operation);
 

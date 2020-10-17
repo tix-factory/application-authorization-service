@@ -12,14 +12,18 @@ namespace TixFactory.ApplicationAuthorization
 {
 	public class ApplicationAuthorizationOperations : IApplicationAuthorizationOperations
 	{
+		private const string _OperationNameSuffix = "Operation";
+
 		private readonly ILogger _Logger;
 		private readonly IApplicationContext _ApplicationContext;
 		private readonly IOperationNameProvider _OperationNameProvider;
-		private readonly IServiceEntityFactory _ServiceEntityFactory;
+		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IOperationEntityFactory _OperationEntityFactory;
 		private readonly ILazyWithRetry<MySqlConnection> _MySqlConnection;
 
-		public IOperation<string, ServiceResult> GetServiceOperation { get; }
+		public IApplicationKeyValidator ApplicationKeyValidator { get; }
+
+		public IOperation<string, ApplicationResult> GetApplicationOperation { get; }
 
 		public ApplicationAuthorizationOperations(ILogger logger, IApplicationContext applicationContext)
 		{
@@ -27,12 +31,16 @@ namespace TixFactory.ApplicationAuthorization
 			_ApplicationContext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
 			_OperationNameProvider = new OperationNameProvider();
 
+			var keyHasher = new KeyHasher();
 			var mySqlConnection = _MySqlConnection = new LazyWithRetry<MySqlConnection>(BuildConnection);
 			var databaseConnection = new DatabaseConnection(mySqlConnection);
-			var serviceEntityFactory = _ServiceEntityFactory = new ServiceEntityFactory(databaseConnection);
+			var applicationEntityFactory = _ApplicationEntityFactory = new ApplicationEntityFactory(databaseConnection);
 			var operationEntityFactory = _OperationEntityFactory = new OperationEntityFactory(databaseConnection);
+			var applicationKeyEntityFactory = new ApplicationKeyEntityFactory(databaseConnection, keyHasher);
+			var applicationOperationAuthorizationEntityFactory = new ApplicationOperationAuthorizationEntityFactory(databaseConnection);
+			var applicationKeyValidator = ApplicationKeyValidator = new ApplicationKeyValidator(applicationEntityFactory, operationEntityFactory, applicationKeyEntityFactory, applicationOperationAuthorizationEntityFactory);
 
-			GetServiceOperation = new GetServiceOperation(serviceEntityFactory, operationEntityFactory);
+			GetApplicationOperation = new GetApplicationOperation(applicationEntityFactory, operationEntityFactory);
 
 			ThreadPool.QueueUserWorkItem(SelfRegistration);
 		}
@@ -61,25 +69,35 @@ namespace TixFactory.ApplicationAuthorization
 		{
 			try
 			{
-				var service = _ServiceEntityFactory.GetServiceByName(_ApplicationContext.Name);
-				if (service == null)
+				var application = _ApplicationEntityFactory.GetApplicationByName(_ApplicationContext.Name);
+				if (application == null)
 				{
-					service = _ServiceEntityFactory.CreateService(_ApplicationContext.Name);
+					application = _ApplicationEntityFactory.CreateApplication(_ApplicationContext.Name);
 				}
 
 				foreach (var operationProperty in GetType().GetProperties())
 				{
+					if (!operationProperty.Name.EndsWith(_OperationNameSuffix))
+					{
+						continue;
+					}
+
 					var operationClass = operationProperty.GetValue(this);
 					if (operationClass != null)
 					{
 						var operationName = _OperationNameProvider.GetOperationName(operationClass.GetType());
-						var operation = _OperationEntityFactory.GetOperationByName(service.Id, operationName);
+						var operation = _OperationEntityFactory.GetOperationByName(application.Id, operationName);
 						if (operation == null)
 						{
-							_OperationEntityFactory.CreateOperation(service.Id, operationName);
+							operation = _OperationEntityFactory.CreateOperation(application.Id, operationName);
+						}
+
+						if (!operation.Enabled)
+						{
+							operation.Enabled = true;
+							_OperationEntityFactory.UpdateOperation(operation);
 						}
 					}
-					
 				}
 			}
 			catch (Exception e)

@@ -32,7 +32,7 @@ namespace TixFactory.ApplicationAuthorization
 		public (ICollection<string> output, OperationError error) Execute(GetAuthorizedOperationsRequest request)
 		{
 			var targetApplicationKey = _ApplicationKeyEntityFactory.GetApplicationKey(request.TargetApplicationKey);
-			if (targetApplicationKey == null)
+			if (targetApplicationKey == null || !targetApplicationKey.Enabled)
 			{
 				return (Array.Empty<string>(), null);
 			}

@@ -33,6 +33,8 @@ namespace TixFactory.ApplicationAuthorization
 
 		public IOperation<RegisterOperationRequest, EmptyResult> RegisterOperationOperation { get; }
 
+		public IOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
+
 		public IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 
 		public ApplicationAuthorizationOperations(ILogger logger, IApplicationContext applicationContext)
@@ -51,8 +53,12 @@ namespace TixFactory.ApplicationAuthorization
 			var applicationKeyValidator = ApplicationKeyValidator = new ApplicationKeyValidator(applicationEntityFactory, operationEntityFactory, applicationKeyEntityFactory, applicationOperationAuthorizationEntityFactory);
 
 			GetApplicationOperation = new GetApplicationOperation(applicationEntityFactory, operationEntityFactory);
+
 			RegisterApplicationOperation = new RegisterApplicationOperation(applicationEntityFactory);
+
 			RegisterOperationOperation = new RegisterOperationOperation(applicationEntityFactory, operationEntityFactory);
+			ToggleOperationEnabledOperation = new ToggleOperationEnabledOperation(applicationEntityFactory, operationEntityFactory);
+
 			GetAuthorizedOperationsOperation = new GetAuthorizedOperationsOperation(applicationEntityFactory, applicationKeyEntityFactory, applicationKeyValidator);
 
 			ThreadPool.QueueUserWorkItem(SelfRegistration);

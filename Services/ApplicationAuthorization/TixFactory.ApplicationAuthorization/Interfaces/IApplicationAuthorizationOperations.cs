@@ -13,6 +13,8 @@ namespace TixFactory.ApplicationAuthorization
 
 		IOperation<RegisterOperationRequest, EmptyResult> RegisterOperationOperation { get; }
 
+		IOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
+
 		IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 	}
 }

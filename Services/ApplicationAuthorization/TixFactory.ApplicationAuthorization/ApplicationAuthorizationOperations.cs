@@ -12,12 +12,16 @@ namespace TixFactory.ApplicationAuthorization
 {
 	public class ApplicationAuthorizationOperations : IApplicationAuthorizationOperations
 	{
+		private const string _OperationNameSuffix = "Operation";
+
 		private readonly ILogger _Logger;
 		private readonly IApplicationContext _ApplicationContext;
 		private readonly IOperationNameProvider _OperationNameProvider;
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IOperationEntityFactory _OperationEntityFactory;
 		private readonly ILazyWithRetry<MySqlConnection> _MySqlConnection;
+
+		public IApplicationKeyValidator ApplicationKeyValidator { get; }
 
 		public IOperation<string, ApplicationResult> GetApplicationOperation { get; }
 
@@ -27,12 +31,14 @@ namespace TixFactory.ApplicationAuthorization
 			_ApplicationContext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
 			_OperationNameProvider = new OperationNameProvider();
 
+			var keyHasher = new KeyHasher();
 			var mySqlConnection = _MySqlConnection = new LazyWithRetry<MySqlConnection>(BuildConnection);
 			var databaseConnection = new DatabaseConnection(mySqlConnection);
 			var applicationEntityFactory = _ApplicationEntityFactory = new ApplicationEntityFactory(databaseConnection);
 			var operationEntityFactory = _OperationEntityFactory = new OperationEntityFactory(databaseConnection);
-			var applicationKeyEntityFactory = new ApplicationKeyEntityFactory(databaseConnection);
+			var applicationKeyEntityFactory = new ApplicationKeyEntityFactory(databaseConnection, keyHasher);
 			var applicationOperationAuthorizationEntityFactory = new ApplicationOperationAuthorizationEntityFactory(databaseConnection);
+			var applicationKeyValidator = ApplicationKeyValidator = new ApplicationKeyValidator(applicationEntityFactory, operationEntityFactory, applicationKeyEntityFactory, applicationOperationAuthorizationEntityFactory);
 
 			GetApplicationOperation = new GetApplicationOperation(applicationEntityFactory, operationEntityFactory);
 
@@ -71,6 +77,11 @@ namespace TixFactory.ApplicationAuthorization
 
 				foreach (var operationProperty in GetType().GetProperties())
 				{
+					if (!operationProperty.Name.EndsWith(_OperationNameSuffix))
+					{
+						continue;
+					}
+
 					var operationClass = operationProperty.GetValue(this);
 					if (operationClass != null)
 					{

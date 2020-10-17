@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TixFactory.ApplicationAuthorization.Service.Controllers;
 using TixFactory.ApplicationContext;
@@ -42,10 +43,11 @@ namespace TixFactory.ApplicationAuthorization.Service
 		private bool TryValidateApiKey(ActionExecutingContext actionContext)
 		{
 			if (actionContext.HttpContext.Request.Headers.TryGetValue(_ApiKeyHeaderName, out var rawApiKey)
-				   && Guid.TryParse(rawApiKey, out var apiKey))
+				   && Guid.TryParse(rawApiKey, out var apiKey)
+				   && actionContext.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
 			{
 				var authorizedOperationNames = _ApplicationKeyValidator.GetAuthorizedOperations(_ApplicationContext.Name, apiKey);
-				return authorizedOperationNames.Contains(actionContext.ActionDescriptor.DisplayName);
+				return authorizedOperationNames.Contains(controllerActionDescriptor.ActionName);
 			}
 
 			return false;

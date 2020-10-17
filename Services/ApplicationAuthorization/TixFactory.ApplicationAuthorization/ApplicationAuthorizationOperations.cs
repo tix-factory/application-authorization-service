@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Linq;
 using System.Threading;
 using MySql.Data.MySqlClient;
 using TixFactory.ApplicationAuthorization.Entities;
@@ -19,6 +20,8 @@ namespace TixFactory.ApplicationAuthorization
 		private readonly IOperationNameProvider _OperationNameProvider;
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IOperationEntityFactory _OperationEntityFactory;
+		private readonly IApplicationKeyEntityFactory _ApplicationKeyEntityFactory;
+		private readonly IApplicationOperationAuthorizationEntityFactory _ApplicationOperationAuthorizationEntityFactory;
 		private readonly ILazyWithRetry<MySqlConnection> _MySqlConnection;
 
 		public IApplicationKeyValidator ApplicationKeyValidator { get; }
@@ -36,8 +39,8 @@ namespace TixFactory.ApplicationAuthorization
 			var databaseConnection = new DatabaseConnection(mySqlConnection);
 			var applicationEntityFactory = _ApplicationEntityFactory = new ApplicationEntityFactory(databaseConnection);
 			var operationEntityFactory = _OperationEntityFactory = new OperationEntityFactory(databaseConnection);
-			var applicationKeyEntityFactory = new ApplicationKeyEntityFactory(databaseConnection, keyHasher);
-			var applicationOperationAuthorizationEntityFactory = new ApplicationOperationAuthorizationEntityFactory(databaseConnection);
+			var applicationKeyEntityFactory = _ApplicationKeyEntityFactory = new ApplicationKeyEntityFactory(databaseConnection, keyHasher);
+			var applicationOperationAuthorizationEntityFactory = _ApplicationOperationAuthorizationEntityFactory = new ApplicationOperationAuthorizationEntityFactory(databaseConnection);
 			var applicationKeyValidator = ApplicationKeyValidator = new ApplicationKeyValidator(applicationEntityFactory, operationEntityFactory, applicationKeyEntityFactory, applicationOperationAuthorizationEntityFactory);
 
 			GetApplicationOperation = new GetApplicationOperation(applicationEntityFactory, operationEntityFactory);
@@ -75,6 +78,19 @@ namespace TixFactory.ApplicationAuthorization
 					application = _ApplicationEntityFactory.CreateApplication(_ApplicationContext.Name);
 				}
 
+				var applicationKeys = _ApplicationKeyEntityFactory.GetApplicationKeysByApplicationId(application.Id);
+				var setupKey = applicationKeys.FirstOrDefault();
+				if (setupKey == null)
+				{
+					var keyGuid = Guid.NewGuid();
+					_ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, keyGuid);
+
+					Console.WriteLine($"Setup ApiKey: {keyGuid}");
+				}
+
+				// Make sure the ApplicationAuthorization service has access to itself.
+				var selfAuthorizations = _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(application.Id);
+
 				foreach (var operationProperty in GetType().GetProperties())
 				{
 					if (!operationProperty.Name.EndsWith(_OperationNameSuffix))
@@ -96,6 +112,11 @@ namespace TixFactory.ApplicationAuthorization
 						{
 							operation.Enabled = true;
 							_OperationEntityFactory.UpdateOperation(operation);
+						}
+
+						if (selfAuthorizations.All(a => a.OperationId != operation.Id))
+						{
+							_ApplicationOperationAuthorizationEntityFactory.CreateApplicationOperationAuthorization(application.Id, operation.Id);
 						}
 					}
 				}

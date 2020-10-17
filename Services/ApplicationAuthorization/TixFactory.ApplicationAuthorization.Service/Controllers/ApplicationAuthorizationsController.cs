@@ -35,6 +35,30 @@ namespace TixFactory.ApplicationAuthorization.Service.Controllers
 		{
 			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.RegisterOperationOperation, request);
 		}
+		
+		[HttpPost]
+		public IActionResult ToggleOperationEnabled([FromBody] ToggleOperationEnabledRequest request)
+		{
+			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.ToggleOperationEnabledOperation, request);
+		}
+
+		[HttpPost]
+		public IActionResult CreateApplicationKey([FromBody] CreateApplicationKeyRequest request)
+		{
+			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.CreateApplicationKeyOperation, request);
+		}
+
+		[HttpPost]
+		public IActionResult DeleteApplicationKey([FromBody] DeleteApplicationKeyRequest request)
+		{
+			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.DeleteApplicationKeyOperation, request);
+		}
+
+		[HttpPost]
+		public IActionResult ToggleApplicationKeyEnabled([FromBody] ToggleApplicationKeyEnabledRequest request)
+		{
+			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.ToggleApplicationKeyEnabledOperation, request);
+		}
 
 		[HttpPost]
 		[AllowAnonymous]

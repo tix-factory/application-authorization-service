@@ -36,6 +36,8 @@ namespace TixFactory.ApplicationAuthorization
 
 		public IOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
 
+		public IOperation<CreateApplicationKeyRequest, Guid> CreateApplicationKeyOperation { get; }
+
 		public IOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
 
 		public IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
@@ -62,6 +64,7 @@ namespace TixFactory.ApplicationAuthorization
 			RegisterOperationOperation = new RegisterOperationOperation(applicationEntityFactory, operationEntityFactory);
 			ToggleOperationEnabledOperation = new ToggleOperationEnabledOperation(applicationEntityFactory, operationEntityFactory);
 
+			CreateApplicationKeyOperation = new CreateApplicationKeyOperation(applicationEntityFactory, applicationKeyEntityFactory);
 			ToggleApplicationKeyEnabledOperation = new ToggleApplicationKeyEnabledOperation(applicationEntityFactory, applicationKeyEntityFactory);
 			GetAuthorizedOperationsOperation = new GetAuthorizedOperationsOperation(applicationEntityFactory, applicationKeyEntityFactory, applicationKeyValidator);
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
@@ -14,6 +15,8 @@ namespace TixFactory.ApplicationAuthorization
 		IOperation<RegisterOperationRequest, EmptyResult> RegisterOperationOperation { get; }
 
 		IOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
+
+		IOperation<CreateApplicationKeyRequest, Guid> CreateApplicationKeyOperation { get; }
 
 		IOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
 

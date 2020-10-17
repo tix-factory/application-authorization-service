@@ -32,13 +32,18 @@ namespace TixFactory.ApplicationAuthorization
 				return Array.Empty<string>();
 			}
 
+			return GetAuthorizedOperations(targetApplication.Id, key);
+		}
+
+		public ICollection<string> GetAuthorizedOperations(long targetApplicationId, Guid key)
+		{
 			var applicationKey = _ApplicationKeyEntityFactory.GetApplicationKey(key);
 			if (applicationKey == null)
 			{
 				return Array.Empty<string>();
 			}
 
-			var targetApplicationOperations = _OperationEntityFactory.GetOperations(targetApplication.Id);
+			var targetApplicationOperations = _OperationEntityFactory.GetOperations(targetApplicationId);
 			if (!targetApplicationOperations.Any())
 			{
 				return Array.Empty<string>();
@@ -46,7 +51,7 @@ namespace TixFactory.ApplicationAuthorization
 
 			var operationNames = new List<string>();
 			var operationMap = targetApplicationOperations.ToDictionary(o => o.Id, o => o.Name);
-			var applicationOperationAuthorizations = _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(targetApplication.Id);
+			var applicationOperationAuthorizations = _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(targetApplicationId);
 
 			foreach (var applicationOperationAuthorization in applicationOperationAuthorizations)
 			{

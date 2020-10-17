@@ -8,6 +8,8 @@ namespace TixFactory.ApplicationAuthorization.Entities
 
 		IReadOnlyCollection<Application> GetApplications();
 
+		Application GetApplicationById(long id);
+
 		Application GetApplicationByName(string name);
 
 		void UpdateApplication(Application application);

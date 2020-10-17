@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
@@ -28,6 +29,8 @@ namespace TixFactory.ApplicationAuthorization
 
 		public IOperation<string, ApplicationResult> GetApplicationOperation { get; }
 
+		public IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
+
 		public ApplicationAuthorizationOperations(ILogger logger, IApplicationContext applicationContext)
 		{
 			_Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -44,6 +47,7 @@ namespace TixFactory.ApplicationAuthorization
 			var applicationKeyValidator = ApplicationKeyValidator = new ApplicationKeyValidator(applicationEntityFactory, operationEntityFactory, applicationKeyEntityFactory, applicationOperationAuthorizationEntityFactory);
 
 			GetApplicationOperation = new GetApplicationOperation(applicationEntityFactory, operationEntityFactory);
+			GetAuthorizedOperationsOperation = new GetAuthorizedOperationsOperation(applicationEntityFactory, applicationKeyEntityFactory, applicationKeyValidator);
 
 			ThreadPool.QueueUserWorkItem(SelfRegistration);
 		}

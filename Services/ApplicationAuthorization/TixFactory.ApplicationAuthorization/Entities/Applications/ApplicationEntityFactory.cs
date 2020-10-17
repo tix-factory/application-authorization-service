@@ -39,12 +39,17 @@ namespace TixFactory.ApplicationAuthorization.Entities
 
 			_Applications.Refresh();
 
-			return _Applications.Value.First(s => s.Id == applicationId);
+			return GetApplicationById(applicationId);
 		}
 
 		public IReadOnlyCollection<Application> GetApplications()
 		{
 			return _Applications.Value;
+		}
+
+		public Application GetApplicationById(long id)
+		{
+			return _Applications.Value.First(s => s.Id == id);
 		}
 
 		public Application GetApplicationByName(string name)

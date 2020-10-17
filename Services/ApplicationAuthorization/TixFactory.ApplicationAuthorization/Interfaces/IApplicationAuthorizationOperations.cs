@@ -1,4 +1,5 @@
-﻿using TixFactory.Operations;
+﻿using System.Collections.Generic;
+using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
@@ -7,5 +8,7 @@ namespace TixFactory.ApplicationAuthorization
 		IApplicationKeyValidator ApplicationKeyValidator { get; }
 
 		IOperation<string, ApplicationResult> GetApplicationOperation { get; }
+
+		IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 	}
 }

@@ -25,6 +25,18 @@ namespace TixFactory.ApplicationAuthorization.Service.Controllers
 		}
 
 		[HttpPost]
+		public IActionResult RegisterApplication([FromBody] RegisterApplicationRequest request)
+		{
+			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.RegisterApplicationOperation, request);
+		}
+
+		[HttpPost]
+		public IActionResult RegisterOperation([FromBody] RegisterOperationRequest request)
+		{
+			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.RegisterOperationOperation, request);
+		}
+
+		[HttpPost]
 		[AllowAnonymous]
 		public IActionResult GetAuthorizedOperations([FromBody] GetAuthorizedOperationsRequest request)
 		{

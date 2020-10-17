@@ -1,11 +1,11 @@
 DELIMITER $$
 USE `application-authorizations`$$
-CREATE PROCEDURE `UpdateService`(
+CREATE PROCEDURE `UpdateApplication`(
 	IN _Name VARBINARY(50),
 	IN _ID BIGINT
 )
 BEGIN
-	UPDATE `application-authorizations`.`services`
+	UPDATE `application-authorizations`.`applications`
 	SET
 		`Name` = _Name,
 		`Updated` = UTC_Timestamp()

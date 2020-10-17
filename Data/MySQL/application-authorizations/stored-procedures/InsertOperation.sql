@@ -1,14 +1,14 @@
 DELIMITER $$
 USE `application-authorizations`$$
 CREATE PROCEDURE `InsertOperation`(
-	IN _ServiceID BIGINT,
+	IN _ApplicationID BIGINT,
 	IN _Name VARBINARY(50),
 	IN _Enabled BIT
 )
 BEGIN
 	INSERT INTO `application-authorizations`.`operations`
 	(
-		`ServiceID`,
+		`ApplicationID`,
 		`Name`,
 		`Enabled`,
 		`Created`,
@@ -16,7 +16,7 @@ BEGIN
 	)
 	VALUES
 	(
-		_ServiceID,
+		_ApplicationID,
 		_Name,
 		_Enabled,
 		UTC_Timestamp(),

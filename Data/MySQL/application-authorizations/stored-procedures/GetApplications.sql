@@ -1,11 +1,11 @@
 DELIMITER $$
 USE `application-authorizations`$$
-CREATE PROCEDURE `GetServices`(
+CREATE PROCEDURE `GetApplications`(
 	IN _Count INTEGER
 )
 BEGIN
 	SELECT *
-		FROM `application-authorizations`.`services`
+		FROM `application-authorizations`.`applications`
 		LIMIT _Count;
 END$$
 

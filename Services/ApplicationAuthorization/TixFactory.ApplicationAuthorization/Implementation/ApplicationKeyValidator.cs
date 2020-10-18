@@ -51,7 +51,7 @@ namespace TixFactory.ApplicationAuthorization
 
 			var operationNames = new List<string>();
 			var operationMap = targetApplicationOperations.Where(o => o.Enabled).ToDictionary(o => o.Id, o => o.Name);
-			var applicationOperationAuthorizations = _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(targetApplicationId);
+			var applicationOperationAuthorizations = _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(applicationKey.ApplicationId);
 
 			foreach (var applicationOperationAuthorization in applicationOperationAuthorizations)
 			{

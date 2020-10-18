@@ -23,5 +23,7 @@ namespace TixFactory.ApplicationAuthorization
 		IOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
 
 		IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
+
+		IOperation<Guid, WhoAmIResult> WhoAmIOperation { get; }
 	}
 }

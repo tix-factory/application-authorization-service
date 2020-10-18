@@ -35,7 +35,7 @@ namespace TixFactory.ApplicationAuthorization.Service.Controllers
 		{
 			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.RegisterOperationOperation, request);
 		}
-		
+
 		[HttpPost]
 		public IActionResult ToggleOperationEnabled([FromBody] ToggleOperationEnabledRequest request)
 		{
@@ -74,6 +74,12 @@ namespace TixFactory.ApplicationAuthorization.Service.Controllers
 			}
 
 			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.GetAuthorizedOperationsOperation, request);
+		}
+
+		[HttpPost]
+		public IActionResult ToggleOperationAuthorization([FromBody] ToggleOperationAuthorizationRequest request)
+		{
+			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.ToggleOperationAuthorizationOperation, request);
 		}
 
 		[HttpPost]

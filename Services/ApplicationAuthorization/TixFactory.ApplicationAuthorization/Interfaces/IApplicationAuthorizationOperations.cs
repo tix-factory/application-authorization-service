@@ -24,6 +24,8 @@ namespace TixFactory.ApplicationAuthorization
 
 		IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 
+		IOperation<ToggleOperationAuthorizationRequest, EmptyResult> ToggleOperationAuthorizationOperation { get; }
+
 		IOperation<Guid, WhoAmIResult> WhoAmIOperation { get; }
 	}
 }

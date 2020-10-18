@@ -75,5 +75,12 @@ namespace TixFactory.ApplicationAuthorization.Service.Controllers
 
 			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.GetAuthorizedOperationsOperation, request);
 		}
+
+		[HttpPost]
+		[AllowAnonymous]
+		public IActionResult WhoAmI([FromHeader(Name = _ApiKeyHeaderName)] Guid apiKey)
+		{
+			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.WhoAmIOperation, apiKey);
+		}
 	}
 }

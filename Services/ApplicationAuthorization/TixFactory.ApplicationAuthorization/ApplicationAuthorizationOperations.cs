@@ -44,6 +44,8 @@ namespace TixFactory.ApplicationAuthorization
 
 		public IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 
+		public IOperation<ToggleOperationAuthorizationRequest, EmptyResult> ToggleOperationAuthorizationOperation { get; }
+
 		public IOperation<Guid, WhoAmIResult> WhoAmIOperation { get; }
 
 		public ApplicationAuthorizationOperations(ILogger logger, IApplicationContext applicationContext)
@@ -72,6 +74,7 @@ namespace TixFactory.ApplicationAuthorization
 			DeleteApplicationKeyOperation = new DeleteApplicationKeyOperation(applicationEntityFactory, applicationKeyEntityFactory);
 			ToggleApplicationKeyEnabledOperation = new ToggleApplicationKeyEnabledOperation(applicationEntityFactory, applicationKeyEntityFactory);
 			GetAuthorizedOperationsOperation = new GetAuthorizedOperationsOperation(applicationEntityFactory, applicationKeyEntityFactory, applicationKeyValidator);
+			ToggleOperationAuthorizationOperation = new ToggleOperationAuthorizationOperation(applicationEntityFactory, operationEntityFactory, applicationOperationAuthorizationEntityFactory);
 			WhoAmIOperation = new WhoAmIOperation(applicationEntityFactory, applicationKeyEntityFactory);
 
 			ThreadPool.QueueUserWorkItem(SelfRegistration);

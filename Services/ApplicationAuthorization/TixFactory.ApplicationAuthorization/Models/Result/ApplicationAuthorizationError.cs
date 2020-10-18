@@ -9,5 +9,7 @@
 		InvalidOperationName = 2,
 
 		InvalidKeyName = 3,
+
+		InvalidTargetApplicationName = 4,
 	}
 }

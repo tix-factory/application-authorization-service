@@ -5,6 +5,7 @@ using System.Threading;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.ApplicationContext;
 using TixFactory.Configuration;
+using TixFactory.Data.MySql;
 using TixFactory.Logging;
 using TixFactory.Operations;
 

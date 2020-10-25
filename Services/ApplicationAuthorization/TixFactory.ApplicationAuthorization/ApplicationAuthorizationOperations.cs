@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading;
-using MySql.Data.MySqlClient;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.ApplicationContext;
 using TixFactory.Configuration;
@@ -24,7 +22,6 @@ namespace TixFactory.ApplicationAuthorization
 		private readonly IOperationEntityFactory _OperationEntityFactory;
 		private readonly IApplicationKeyEntityFactory _ApplicationKeyEntityFactory;
 		private readonly IApplicationOperationAuthorizationEntityFactory _ApplicationOperationAuthorizationEntityFactory;
-		private readonly ILazyWithRetry<MySqlConnection> _MySqlConnection;
 
 		public IApplicationKeyValidator ApplicationKeyValidator { get; }
 
@@ -55,8 +52,8 @@ namespace TixFactory.ApplicationAuthorization
 			_OperationNameProvider = new OperationNameProvider();
 
 			var keyHasher = new KeyHasher();
-			var mySqlConnection = _MySqlConnection = new LazyWithRetry<MySqlConnection>(BuildConnection);
-			var databaseConnection = new DatabaseConnection(mySqlConnection);
+			var connectionString = new Setting<string>(Environment.GetEnvironmentVariable("APPLICATION_AUTHORIZATIONS_CONNECTION_STRING"));
+			var databaseConnection = new DatabaseConnection(connectionString);
 			var applicationEntityFactory = _ApplicationEntityFactory = new ApplicationEntityFactory(databaseConnection);
 			var operationEntityFactory = _OperationEntityFactory = new OperationEntityFactory(databaseConnection);
 			var applicationKeyEntityFactory = _ApplicationKeyEntityFactory = new ApplicationKeyEntityFactory(databaseConnection, keyHasher);
@@ -78,26 +75,6 @@ namespace TixFactory.ApplicationAuthorization
 			WhoAmIOperation = new WhoAmIOperation(applicationEntityFactory, applicationKeyEntityFactory);
 
 			ThreadPool.QueueUserWorkItem(SelfRegistration);
-		}
-
-		private MySqlConnection BuildConnection()
-		{
-			var connection = new MySqlConnection(Environment.GetEnvironmentVariable("APPLICATION_AUTHORIZATIONS_CONNECTION_STRING"));
-			connection.StateChange += ConnectionStateChange;
-			connection.Open();
-
-			return connection;
-		}
-
-		private void ConnectionStateChange(object sender, StateChangeEventArgs e)
-		{
-			switch (e.CurrentState)
-			{
-				case ConnectionState.Broken:
-				case ConnectionState.Closed:
-					_MySqlConnection.Refresh();
-					return;
-			}
 		}
 
 		private void SelfRegistration(object state)

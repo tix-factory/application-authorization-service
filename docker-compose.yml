@@ -4,7 +4,8 @@ services:
     image: tixfactory/application-authorization-service:latest
     container_name: application-authorization-service
     environment:
-      APPLICATION_AUTHORIZATIONS_CONNECTION_STRING: "" # ME: Put the actual connection string in the quotes when deploying! 
+      APPLICATION_AUTHORIZATIONS_CONNECTION_STRING: "" # ME: Put the actual connection string in the quotes when deploying!
+      LoggingServiceHost: logging.services.tixfactory.systems
     networks:
       tix-factory:
         aliases:

@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using TixFactory.Http.Client;
@@ -34,7 +35,8 @@ namespace TixFactory.ApplicationAuthorization.Service
 		{
 			var httpClient = new HttpClient();
 			var consoleLogger = new ConsoleLogger();
-			return new NetworkLogger(httpClient, consoleLogger, "TFAAS1.TixFactory.ApplicationAuthorization.Service", "monitoring.tixfactory.systems");
+			var loggingServiceHost = Environment.GetEnvironmentVariable("LoggingServiceHost");
+			return new NetworkLogger(httpClient, consoleLogger, "TFAAS1.TixFactory.ApplicationAuthorization.Service", loggingServiceHost);
 		}
 	}
 }

@@ -31,14 +31,14 @@ namespace TixFactory.ApplicationAuthorization
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidKeyName));
 			}
 
-			var applicationKey = _ApplicationKeyEntityFactory.GetApplicationKeyByApplicationIdAndName(application.Id, request.KeyName);
+			var applicationKey = await _ApplicationKeyEntityFactory.GetApplicationKeyByApplicationIdAndName(application.Id, request.KeyName, cancellationToken).ConfigureAwait(false);
 			if (applicationKey != null)
 			{
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidKeyName));
 			}
 
 			var key = Guid.NewGuid();
-			_ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, request.KeyName, key);
+			await _ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, request.KeyName, key, cancellationToken).ConfigureAwait(false);
 
 			return (key, null);
 		}

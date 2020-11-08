@@ -25,10 +25,10 @@ namespace TixFactory.ApplicationAuthorization
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidApplicationName));
 			}
 
-			var applicationKey = _ApplicationKeyEntityFactory.GetApplicationKeyByApplicationIdAndName(application.Id, request.KeyName);
+			var applicationKey = await _ApplicationKeyEntityFactory.GetApplicationKeyByApplicationIdAndName(application.Id, request.KeyName, cancellationToken).ConfigureAwait(false);
 			if (applicationKey != null)
 			{
-				_ApplicationKeyEntityFactory.DeleteApplicationKey(applicationKey.Id);
+				await _ApplicationKeyEntityFactory.DeleteApplicationKey(applicationKey, cancellationToken).ConfigureAwait(false);
 			}
 
 			return (new EmptyResult(), null);

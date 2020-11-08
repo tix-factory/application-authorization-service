@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.ApplicationContext;
 using TixFactory.Configuration;
@@ -75,10 +76,10 @@ namespace TixFactory.ApplicationAuthorization
 			ToggleOperationAuthorizationOperation = new ToggleOperationAuthorizationOperation(applicationEntityFactory, operationEntityFactory, applicationOperationAuthorizationEntityFactory);
 			WhoAmIOperation = new WhoAmIOperation(applicationEntityFactory, applicationKeyEntityFactory);
 
-			ThreadPool.QueueUserWorkItem(SelfRegistration);
+			ThreadPool.QueueUserWorkItem(async state => await SelfRegistration(state, CancellationToken.None).ConfigureAwait(false));
 		}
 
-		private void SelfRegistration(object state)
+		private async Task SelfRegistration(object state, CancellationToken cancellationToken)
 		{
 			try
 			{
@@ -88,12 +89,12 @@ namespace TixFactory.ApplicationAuthorization
 					application = _ApplicationEntityFactory.CreateApplication(_ApplicationContext.Name);
 				}
 
-				var applicationKeys = _ApplicationKeyEntityFactory.GetApplicationKeysByApplicationId(application.Id);
+				var applicationKeys = await _ApplicationKeyEntityFactory.GetApplicationKeysByApplicationId(application.Id, cancellationToken).ConfigureAwait(false);
 				var setupKey = applicationKeys.FirstOrDefault();
 				if (setupKey == null)
 				{
 					var keyGuid = Guid.NewGuid();
-					setupKey = _ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, _SetupKeyName, keyGuid);
+					setupKey = await _ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, _SetupKeyName, keyGuid, cancellationToken).ConfigureAwait(false);
 
 					Console.WriteLine($"Setup ApiKey ({setupKey.Name}): {keyGuid}");
 				}

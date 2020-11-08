@@ -33,14 +33,14 @@ namespace TixFactory.ApplicationAuthorization
 
 		public async Task<(ICollection<string> output, OperationError error)> Execute(GetAuthorizedOperationsRequest request, CancellationToken cancellationToken)
 		{
-			var targetApplicationKey = _ApplicationKeyEntityFactory.GetApplicationKey(request.TargetApplicationKey);
+			var targetApplicationKey = await _ApplicationKeyEntityFactory.GetApplicationKey(request.TargetApplicationKey, cancellationToken).ConfigureAwait(false);
 			if (targetApplicationKey == null || !targetApplicationKey.Enabled)
 			{
 				return (Array.Empty<string>(), null);
 			}
 
 			var targetApplication = _ApplicationEntityFactory.GetApplicationById(targetApplicationKey.ApplicationId);
-			var authorizedOperations = _ApplicationKeyValidator.GetAuthorizedOperations(targetApplication.Id, request.ApiKey);
+			var authorizedOperations = await _ApplicationKeyValidator.GetAuthorizedOperations(targetApplication.Id, request.ApiKey, cancellationToken).ConfigureAwait(false);
 			return (authorizedOperations, null);
 		}
 	}

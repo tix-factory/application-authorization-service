@@ -21,7 +21,7 @@ namespace TixFactory.ApplicationAuthorization
 
 		public async Task<(WhoAmIResult output, OperationError error)> Execute(Guid applicationKey, CancellationToken cancellationToken)
 		{
-			var targetApplicationKey = _ApplicationKeyEntityFactory.GetApplicationKey(applicationKey);
+			var targetApplicationKey = await _ApplicationKeyEntityFactory.GetApplicationKey(applicationKey, cancellationToken).ConfigureAwait(false);
 			if (targetApplicationKey == null || !targetApplicationKey.Enabled)
 			{
 				return (null, null);

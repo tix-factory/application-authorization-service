@@ -43,16 +43,16 @@ namespace TixFactory.ApplicationAuthorization
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidOperationName));
 			}
 
-			var applicationAuthorizations = _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(application.Id);
+			var applicationAuthorizations = await _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(application.Id, cancellationToken).ConfigureAwait(false);
 			var authorizationEntity = applicationAuthorizations.FirstOrDefault(a => a.OperationId == operation.Id);
 
 			if (request.Authorized && authorizationEntity == null)
 			{
-				_ApplicationOperationAuthorizationEntityFactory.CreateApplicationOperationAuthorization(application.Id, operation.Id);
+				await _ApplicationOperationAuthorizationEntityFactory.CreateApplicationOperationAuthorization(application.Id, operation.Id, cancellationToken).ConfigureAwait(false);
 			}
 			else if (!request.Authorized && authorizationEntity != null)
 			{
-				_ApplicationOperationAuthorizationEntityFactory.DeleteApplicationOperationAuthorization(authorizationEntity.Id);
+				await _ApplicationOperationAuthorizationEntityFactory.DeleteApplicationOperationAuthorization(authorizationEntity, cancellationToken).ConfigureAwait(false);
 			}
 
 			return (new EmptyResult(), null);

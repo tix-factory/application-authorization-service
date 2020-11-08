@@ -100,7 +100,7 @@ namespace TixFactory.ApplicationAuthorization
 				}
 
 				// Make sure the ApplicationAuthorization service has access to itself.
-				var selfAuthorizations = _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(application.Id);
+				var selfAuthorizations = await _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(application.Id, cancellationToken).ConfigureAwait(false);
 
 				foreach (var operationProperty in GetType().GetProperties())
 				{
@@ -127,7 +127,7 @@ namespace TixFactory.ApplicationAuthorization
 
 						if (selfAuthorizations.All(a => a.OperationId != operation.Id))
 						{
-							_ApplicationOperationAuthorizationEntityFactory.CreateApplicationOperationAuthorization(application.Id, operation.Id);
+							await _ApplicationOperationAuthorizationEntityFactory.CreateApplicationOperationAuthorization(application.Id, operation.Id, cancellationToken).ConfigureAwait(false);
 						}
 					}
 				}

@@ -113,16 +113,16 @@ namespace TixFactory.ApplicationAuthorization
 					if (operationClass != null)
 					{
 						var operationName = _OperationNameProvider.GetOperationName(operationClass.GetType());
-						var operation = _OperationEntityFactory.GetOperationByName(application.Id, operationName);
+						var operation = await _OperationEntityFactory.GetOperationByName(application.Id, operationName, cancellationToken).ConfigureAwait(false);
 						if (operation == null)
 						{
-							operation = _OperationEntityFactory.CreateOperation(application.Id, operationName);
+							operation = await _OperationEntityFactory.CreateOperation(application.Id, operationName, cancellationToken).ConfigureAwait(false);
 						}
 
 						if (!operation.Enabled)
 						{
 							operation.Enabled = true;
-							_OperationEntityFactory.UpdateOperation(operation);
+							await _OperationEntityFactory.UpdateOperation(operation, cancellationToken).ConfigureAwait(false);
 						}
 
 						if (selfAuthorizations.All(a => a.OperationId != operation.Id))

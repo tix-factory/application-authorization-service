@@ -45,7 +45,7 @@ namespace TixFactory.ApplicationAuthorization
 				return Array.Empty<string>();
 			}
 
-			var targetApplicationOperations = _OperationEntityFactory.GetOperations(targetApplicationId);
+			var targetApplicationOperations = await _OperationEntityFactory.GetOperations(targetApplicationId, cancellationToken).ConfigureAwait(false);
 			if (!targetApplicationOperations.Any())
 			{
 				return Array.Empty<string>();

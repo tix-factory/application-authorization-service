@@ -25,7 +25,7 @@ namespace TixFactory.ApplicationAuthorization
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidApplicationName));
 			}
 
-			var operation = _OperationEntityFactory.GetOperationByName(application.Id, request.OperationName);
+			var operation = await _OperationEntityFactory.GetOperationByName(application.Id, request.OperationName, cancellationToken).ConfigureAwait(false);
 			if (operation == null)
 			{
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidOperationName));
@@ -34,7 +34,7 @@ namespace TixFactory.ApplicationAuthorization
 			if (operation.Enabled != request.Enabled)
 			{
 				operation.Enabled = request.Enabled;
-				_OperationEntityFactory.UpdateOperation(operation);
+				await _OperationEntityFactory.UpdateOperation(operation, cancellationToken).ConfigureAwait(false);
 			}
 
 			return (new EmptyResult(), null);

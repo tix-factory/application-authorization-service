@@ -25,7 +25,7 @@ namespace TixFactory.ApplicationAuthorization
 			ApplicationResult result = null;
 			if (application != null)
 			{
-				var operations = _OperationEntityFactory.GetOperations(application.Id);
+				var operations = await _OperationEntityFactory.GetOperations(application.Id, cancellationToken).ConfigureAwait(false);
 
 				result = new ApplicationResult
 				{

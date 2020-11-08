@@ -37,7 +37,7 @@ namespace TixFactory.ApplicationAuthorization
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidTargetApplicationName));
 			}
 
-			var operation = _OperationEntityFactory.GetOperationByName(targetApplication.Id, request.TargetOperationName);
+			var operation = await _OperationEntityFactory.GetOperationByName(targetApplication.Id, request.TargetOperationName, cancellationToken).ConfigureAwait(false);
 			if (operation == null)
 			{
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidOperationName));

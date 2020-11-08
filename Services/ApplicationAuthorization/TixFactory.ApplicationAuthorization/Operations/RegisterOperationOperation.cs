@@ -31,10 +31,10 @@ namespace TixFactory.ApplicationAuthorization
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidApplicationName));
 			}
 
-			var operation = _OperationEntityFactory.GetOperationByName(application.Id, request.OperationName);
+			var operation = await _OperationEntityFactory.GetOperationByName(application.Id, request.OperationName, cancellationToken).ConfigureAwait(false);
 			if (operation == null)
 			{
-				operation = _OperationEntityFactory.CreateOperation(application.Id, request.OperationName);
+				operation = await _OperationEntityFactory.CreateOperation(application.Id, request.OperationName, cancellationToken).ConfigureAwait(false);
 			}
 
 			return (new EmptyResult(), null);

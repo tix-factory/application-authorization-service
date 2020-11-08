@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.ApplicationContext;
 using TixFactory.Configuration;
@@ -26,25 +27,25 @@ namespace TixFactory.ApplicationAuthorization
 
 		public IApplicationKeyValidator ApplicationKeyValidator { get; }
 
-		public IOperation<string, ApplicationResult> GetApplicationOperation { get; }
+		public IAsyncOperation<string, ApplicationResult> GetApplicationOperation { get; }
 
-		public IOperation<RegisterApplicationRequest, EmptyResult> RegisterApplicationOperation { get; }
+		public IAsyncOperation<RegisterApplicationRequest, EmptyResult> RegisterApplicationOperation { get; }
 
-		public IOperation<RegisterOperationRequest, EmptyResult> RegisterOperationOperation { get; }
+		public IAsyncOperation<RegisterOperationRequest, EmptyResult> RegisterOperationOperation { get; }
 
-		public IOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
+		public IAsyncOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
 
-		public IOperation<CreateApplicationKeyRequest, Guid> CreateApplicationKeyOperation { get; }
+		public IAsyncOperation<CreateApplicationKeyRequest, Guid> CreateApplicationKeyOperation { get; }
 
-		public IOperation<DeleteApplicationKeyRequest, EmptyResult> DeleteApplicationKeyOperation { get; }
+		public IAsyncOperation<DeleteApplicationKeyRequest, EmptyResult> DeleteApplicationKeyOperation { get; }
 
-		public IOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
+		public IAsyncOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
 
-		public IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
+		public IAsyncOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 
-		public IOperation<ToggleOperationAuthorizationRequest, EmptyResult> ToggleOperationAuthorizationOperation { get; }
+		public IAsyncOperation<ToggleOperationAuthorizationRequest, EmptyResult> ToggleOperationAuthorizationOperation { get; }
 
-		public IOperation<Guid, WhoAmIResult> WhoAmIOperation { get; }
+		public IAsyncOperation<Guid, WhoAmIResult> WhoAmIOperation { get; }
 
 		public ApplicationAuthorizationOperations(ILogger logger, IApplicationContext applicationContext)
 		{
@@ -54,7 +55,7 @@ namespace TixFactory.ApplicationAuthorization
 
 			var keyHasher = new KeyHasher();
 			var connectionString = new Setting<string>(Environment.GetEnvironmentVariable("APPLICATION_AUTHORIZATIONS_CONNECTION_STRING"));
-			var databaseConnection = new DatabaseConnection(connectionString);
+			var databaseConnection = new DatabaseConnection(connectionString, logger);
 			var applicationEntityFactory = _ApplicationEntityFactory = new ApplicationEntityFactory(databaseConnection);
 			var operationEntityFactory = _OperationEntityFactory = new OperationEntityFactory(databaseConnection);
 			var applicationKeyEntityFactory = _ApplicationKeyEntityFactory = new ApplicationKeyEntityFactory(databaseConnection, keyHasher);
@@ -75,10 +76,10 @@ namespace TixFactory.ApplicationAuthorization
 			ToggleOperationAuthorizationOperation = new ToggleOperationAuthorizationOperation(applicationEntityFactory, operationEntityFactory, applicationOperationAuthorizationEntityFactory);
 			WhoAmIOperation = new WhoAmIOperation(applicationEntityFactory, applicationKeyEntityFactory);
 
-			ThreadPool.QueueUserWorkItem(SelfRegistration);
+			ThreadPool.QueueUserWorkItem(async state => await SelfRegistration(state, CancellationToken.None).ConfigureAwait(false));
 		}
 
-		private void SelfRegistration(object state)
+		private async Task SelfRegistration(object state, CancellationToken cancellationToken)
 		{
 			try
 			{
@@ -88,18 +89,18 @@ namespace TixFactory.ApplicationAuthorization
 					application = _ApplicationEntityFactory.CreateApplication(_ApplicationContext.Name);
 				}
 
-				var applicationKeys = _ApplicationKeyEntityFactory.GetApplicationKeysByApplicationId(application.Id);
+				var applicationKeys = await _ApplicationKeyEntityFactory.GetApplicationKeysByApplicationId(application.Id, cancellationToken).ConfigureAwait(false);
 				var setupKey = applicationKeys.FirstOrDefault();
 				if (setupKey == null)
 				{
 					var keyGuid = Guid.NewGuid();
-					setupKey = _ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, _SetupKeyName, keyGuid);
+					setupKey = await _ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, _SetupKeyName, keyGuid, cancellationToken).ConfigureAwait(false);
 
 					Console.WriteLine($"Setup ApiKey ({setupKey.Name}): {keyGuid}");
 				}
 
 				// Make sure the ApplicationAuthorization service has access to itself.
-				var selfAuthorizations = _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(application.Id);
+				var selfAuthorizations = await _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(application.Id, cancellationToken).ConfigureAwait(false);
 
 				foreach (var operationProperty in GetType().GetProperties())
 				{
@@ -112,21 +113,21 @@ namespace TixFactory.ApplicationAuthorization
 					if (operationClass != null)
 					{
 						var operationName = _OperationNameProvider.GetOperationName(operationClass.GetType());
-						var operation = _OperationEntityFactory.GetOperationByName(application.Id, operationName);
+						var operation = await _OperationEntityFactory.GetOperationByName(application.Id, operationName, cancellationToken).ConfigureAwait(false);
 						if (operation == null)
 						{
-							operation = _OperationEntityFactory.CreateOperation(application.Id, operationName);
+							operation = await _OperationEntityFactory.CreateOperation(application.Id, operationName, cancellationToken).ConfigureAwait(false);
 						}
 
 						if (!operation.Enabled)
 						{
 							operation.Enabled = true;
-							_OperationEntityFactory.UpdateOperation(operation);
+							await _OperationEntityFactory.UpdateOperation(operation, cancellationToken).ConfigureAwait(false);
 						}
 
 						if (selfAuthorizations.All(a => a.OperationId != operation.Id))
 						{
-							_ApplicationOperationAuthorizationEntityFactory.CreateApplicationOperationAuthorization(application.Id, operation.Id);
+							await _ApplicationOperationAuthorizationEntityFactory.CreateApplicationOperationAuthorization(application.Id, operation.Id, cancellationToken).ConfigureAwait(false);
 						}
 					}
 				}

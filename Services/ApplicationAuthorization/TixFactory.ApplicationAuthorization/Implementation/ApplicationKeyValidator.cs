@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 
 namespace TixFactory.ApplicationAuthorization
@@ -24,7 +26,7 @@ namespace TixFactory.ApplicationAuthorization
 			_ApplicationOperationAuthorizationEntityFactory = applicationOperationAuthorizationEntityFactory ?? throw new ArgumentNullException(nameof(applicationOperationAuthorizationEntityFactory));
 		}
 
-		public ICollection<string> GetAuthorizedOperations(string targetApplicationName, Guid key)
+		public async Task<ICollection<string>> GetAuthorizedOperations(string targetApplicationName, Guid key, CancellationToken cancellationToken)
 		{
 			var targetApplication = _ApplicationEntityFactory.GetApplicationByName(targetApplicationName);
 			if (targetApplication == null)
@@ -32,18 +34,18 @@ namespace TixFactory.ApplicationAuthorization
 				return Array.Empty<string>();
 			}
 
-			return GetAuthorizedOperations(targetApplication.Id, key);
+			return await GetAuthorizedOperations(targetApplication.Id, key, cancellationToken).ConfigureAwait(false);
 		}
 
-		public ICollection<string> GetAuthorizedOperations(long targetApplicationId, Guid key)
+		public async Task<ICollection<string>> GetAuthorizedOperations(long targetApplicationId, Guid key, CancellationToken cancellationToken)
 		{
-			var applicationKey = _ApplicationKeyEntityFactory.GetApplicationKey(key);
+			var applicationKey = await _ApplicationKeyEntityFactory.GetApplicationKey(key, cancellationToken).ConfigureAwait(false);
 			if (applicationKey == null || !applicationKey.Enabled)
 			{
 				return Array.Empty<string>();
 			}
 
-			var targetApplicationOperations = _OperationEntityFactory.GetOperations(targetApplicationId);
+			var targetApplicationOperations = await _OperationEntityFactory.GetOperations(targetApplicationId, cancellationToken).ConfigureAwait(false);
 			if (!targetApplicationOperations.Any())
 			{
 				return Array.Empty<string>();
@@ -51,7 +53,7 @@ namespace TixFactory.ApplicationAuthorization
 
 			var operationNames = new List<string>();
 			var operationMap = targetApplicationOperations.Where(o => o.Enabled).ToDictionary(o => o.Id, o => o.Name);
-			var applicationOperationAuthorizations = _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(applicationKey.ApplicationId);
+			var applicationOperationAuthorizations = await _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(applicationKey.ApplicationId, cancellationToken).ConfigureAwait(false);
 
 			foreach (var applicationOperationAuthorization in applicationOperationAuthorizations)
 			{

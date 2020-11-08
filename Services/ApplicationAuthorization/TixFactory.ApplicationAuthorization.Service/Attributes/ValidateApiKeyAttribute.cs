@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -28,7 +30,28 @@ namespace TixFactory.ApplicationAuthorization.Service
 			});
 		}
 
-		public override void OnActionExecuting(ActionExecutingContext actionContext)
+		public override async Task OnActionExecutionAsync(
+			ActionExecutingContext context,
+			ActionExecutionDelegate next)
+		{
+			if (context == null)
+			{
+				throw new ArgumentNullException(nameof(context));
+			}
+
+			if (next == null)
+			{
+				throw new ArgumentNullException(nameof(next));
+			}
+
+			await OnActionExecutingAsync(context, context.HttpContext.RequestAborted).ConfigureAwait(false);
+			if (context.Result == null)
+			{
+				OnActionExecuted(await next().ConfigureAwait(false));
+			}
+		}
+
+		private async Task OnActionExecutingAsync(ActionExecutingContext actionContext, CancellationToken cancellationToken)
 		{
 			if (!ShouldValidateApiKey(actionContext))
 			{
@@ -36,7 +59,8 @@ namespace TixFactory.ApplicationAuthorization.Service
 				return;
 			}
 
-			if (!TryValidateApiKey(actionContext))
+			var validated = await TryValidateApiKey(actionContext, cancellationToken).ConfigureAwait(false);
+			if (!validated)
 			{
 				actionContext.Result = new UnauthorizedResult();
 			}
@@ -61,13 +85,13 @@ namespace TixFactory.ApplicationAuthorization.Service
 			return true;
 		}
 
-		private bool TryValidateApiKey(ActionExecutingContext actionContext)
+		private async Task<bool> TryValidateApiKey(ActionExecutingContext actionContext, CancellationToken cancellationToken)
 		{
 			if (actionContext.HttpContext.Request.Headers.TryGetValue(_ApiKeyHeaderName, out var rawApiKey)
 				   && Guid.TryParse(rawApiKey, out var apiKey)
 				   && actionContext.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
 			{
-				var authorizedOperationNames = _ApplicationKeyValidator.GetAuthorizedOperations(_ApplicationContext.Name, apiKey);
+				var authorizedOperationNames = await _ApplicationKeyValidator.GetAuthorizedOperations(_ApplicationContext.Name, apiKey, cancellationToken).ConfigureAwait(false);
 				return authorizedOperationNames.Contains(controllerActionDescriptor.ActionName);
 			}
 

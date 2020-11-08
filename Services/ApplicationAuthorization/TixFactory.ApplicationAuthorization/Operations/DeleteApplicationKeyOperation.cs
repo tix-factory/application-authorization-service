@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
-	internal class DeleteApplicationKeyOperation : IOperation<DeleteApplicationKeyRequest, EmptyResult>
+	internal class DeleteApplicationKeyOperation : IAsyncOperation<DeleteApplicationKeyRequest, EmptyResult>
 	{
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IApplicationKeyEntityFactory _ApplicationKeyEntityFactory;
@@ -15,7 +17,7 @@ namespace TixFactory.ApplicationAuthorization
 			_ApplicationKeyEntityFactory = applicationKeyEntityFactory ?? throw new ArgumentNullException(nameof(applicationKeyEntityFactory));
 		}
 
-		public (EmptyResult output, OperationError error) Execute(DeleteApplicationKeyRequest request)
+		public async Task<(EmptyResult output, OperationError error)> Execute(DeleteApplicationKeyRequest request, CancellationToken cancellationToken)
 		{
 			var application = _ApplicationEntityFactory.GetApplicationByName(request.ApplicationName);
 			if (application == null)
@@ -23,10 +25,10 @@ namespace TixFactory.ApplicationAuthorization
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidApplicationName));
 			}
 
-			var applicationKey = _ApplicationKeyEntityFactory.GetApplicationKeyByApplicationIdAndName(application.Id, request.KeyName);
+			var applicationKey = await _ApplicationKeyEntityFactory.GetApplicationKeyByApplicationIdAndName(application.Id, request.KeyName, cancellationToken).ConfigureAwait(false);
 			if (applicationKey != null)
 			{
-				_ApplicationKeyEntityFactory.DeleteApplicationKey(applicationKey.Id);
+				await _ApplicationKeyEntityFactory.DeleteApplicationKey(applicationKey, cancellationToken).ConfigureAwait(false);
 			}
 
 			return (new EmptyResult(), null);

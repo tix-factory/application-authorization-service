@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
-	internal class GetApplicationOperation : IOperation<string, ApplicationResult>
+	internal class GetApplicationOperation : IAsyncOperation<string, ApplicationResult>
 	{
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IOperationEntityFactory _OperationEntityFactory;
@@ -16,14 +18,14 @@ namespace TixFactory.ApplicationAuthorization
 			_OperationEntityFactory = operationEntityFactory ?? throw new ArgumentNullException(nameof(operationEntityFactory));
 		}
 
-		public (ApplicationResult output, OperationError error) Execute(string applicationName)
+		public async Task<(ApplicationResult output, OperationError error)> Execute(string applicationName, CancellationToken cancellationToken)
 		{
 			var application = _ApplicationEntityFactory.GetApplicationByName(applicationName);
 
 			ApplicationResult result = null;
 			if (application != null)
 			{
-				var operations = _OperationEntityFactory.GetOperations(application.Id);
+				var operations = await _OperationEntityFactory.GetOperations(application.Id, cancellationToken).ConfigureAwait(false);
 
 				result = new ApplicationResult
 				{

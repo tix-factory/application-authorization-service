@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace TixFactory.ApplicationAuthorization.Entities
 {
 	internal interface IApplicationKeyEntityFactory
 	{
-		ApplicationKey CreateApplicationKey(long applicationId, string name, Guid key);
+		Task<ApplicationKey> CreateApplicationKey(long applicationId, string name, Guid key, CancellationToken cancellationToken);
 
-		ApplicationKey GetApplicationKey(Guid key);
+		Task<ApplicationKey> GetApplicationKey(Guid key, CancellationToken cancellationToken);
 
-		ApplicationKey GetApplicationKeyByApplicationIdAndName(long applicationId, string name);
+		Task<ApplicationKey> GetApplicationKeyByApplicationIdAndName(long applicationId, string name, CancellationToken cancellationToken);
 
-		IReadOnlyCollection<ApplicationKey> GetApplicationKeysByApplicationId(long applicationId);
+		Task<IReadOnlyCollection<ApplicationKey>> GetApplicationKeysByApplicationId(long applicationId, CancellationToken cancellationToken);
 
-		void UpdateApplicationKey(ApplicationKey applicationKey);
+		Task UpdateApplicationKey(ApplicationKey applicationKey, CancellationToken cancellationToken);
 
-		void DeleteApplicationKey(long id);
+		Task DeleteApplicationKey(ApplicationKey applicationKey, CancellationToken cancellationToken);
 	}
 }

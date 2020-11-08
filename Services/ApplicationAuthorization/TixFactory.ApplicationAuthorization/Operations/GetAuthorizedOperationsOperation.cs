@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Operations;
 
@@ -13,7 +15,7 @@ namespace TixFactory.ApplicationAuthorization
 	/// I have received a request with this ApiKey: <see cref="GetAuthorizedOperationsRequest.ApiKey"/>.
 	/// Please tell me which operations the ApiKey I have received has access to.
 	/// </remarks>
-	internal class GetAuthorizedOperationsOperation : IOperation<GetAuthorizedOperationsRequest, ICollection<string>>
+	internal class GetAuthorizedOperationsOperation : IAsyncOperation<GetAuthorizedOperationsRequest, ICollection<string>>
 	{
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IApplicationKeyEntityFactory _ApplicationKeyEntityFactory;
@@ -29,16 +31,16 @@ namespace TixFactory.ApplicationAuthorization
 			_ApplicationKeyValidator = applicationKeyValidator ?? throw new ArgumentNullException(nameof(applicationKeyValidator));
 		}
 
-		public (ICollection<string> output, OperationError error) Execute(GetAuthorizedOperationsRequest request)
+		public async Task<(ICollection<string> output, OperationError error)> Execute(GetAuthorizedOperationsRequest request, CancellationToken cancellationToken)
 		{
-			var targetApplicationKey = _ApplicationKeyEntityFactory.GetApplicationKey(request.TargetApplicationKey);
+			var targetApplicationKey = await _ApplicationKeyEntityFactory.GetApplicationKey(request.TargetApplicationKey, cancellationToken).ConfigureAwait(false);
 			if (targetApplicationKey == null || !targetApplicationKey.Enabled)
 			{
 				return (Array.Empty<string>(), null);
 			}
 
 			var targetApplication = _ApplicationEntityFactory.GetApplicationById(targetApplicationKey.ApplicationId);
-			var authorizedOperations = _ApplicationKeyValidator.GetAuthorizedOperations(targetApplication.Id, request.ApiKey);
+			var authorizedOperations = await _ApplicationKeyValidator.GetAuthorizedOperations(targetApplication.Id, request.ApiKey, cancellationToken).ConfigureAwait(false);
 			return (authorizedOperations, null);
 		}
 	}

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
-	internal class ToggleOperationAuthorizationOperation : IOperation<ToggleOperationAuthorizationRequest, EmptyResult>
+	internal class ToggleOperationAuthorizationOperation : IAsyncOperation<ToggleOperationAuthorizationRequest, EmptyResult>
 	{
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IOperationEntityFactory _OperationEntityFactory;
@@ -21,7 +23,7 @@ namespace TixFactory.ApplicationAuthorization
 			_ApplicationOperationAuthorizationEntityFactory = applicationOperationAuthorizationEntityFactory ?? throw new ArgumentNullException(nameof(applicationOperationAuthorizationEntityFactory));
 		}
 
-		public (EmptyResult output, OperationError error) Execute(ToggleOperationAuthorizationRequest request)
+		public async Task<(EmptyResult output, OperationError error)> Execute(ToggleOperationAuthorizationRequest request, CancellationToken cancellationToken)
 		{
 			var application = _ApplicationEntityFactory.GetApplicationByName(request.ApplicationName);
 			if (application == null)
@@ -35,22 +37,22 @@ namespace TixFactory.ApplicationAuthorization
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidTargetApplicationName));
 			}
 
-			var operation = _OperationEntityFactory.GetOperationByName(targetApplication.Id, request.TargetOperationName);
+			var operation = await _OperationEntityFactory.GetOperationByName(targetApplication.Id, request.TargetOperationName, cancellationToken).ConfigureAwait(false);
 			if (operation == null)
 			{
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidOperationName));
 			}
 
-			var applicationAuthorizations = _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(application.Id);
+			var applicationAuthorizations = await _ApplicationOperationAuthorizationEntityFactory.GetApplicationOperationAuthorizationsByApplicationId(application.Id, cancellationToken).ConfigureAwait(false);
 			var authorizationEntity = applicationAuthorizations.FirstOrDefault(a => a.OperationId == operation.Id);
 
 			if (request.Authorized && authorizationEntity == null)
 			{
-				_ApplicationOperationAuthorizationEntityFactory.CreateApplicationOperationAuthorization(application.Id, operation.Id);
+				await _ApplicationOperationAuthorizationEntityFactory.CreateApplicationOperationAuthorization(application.Id, operation.Id, cancellationToken).ConfigureAwait(false);
 			}
 			else if (!request.Authorized && authorizationEntity != null)
 			{
-				_ApplicationOperationAuthorizationEntityFactory.DeleteApplicationOperationAuthorization(authorizationEntity.Id);
+				await _ApplicationOperationAuthorizationEntityFactory.DeleteApplicationOperationAuthorization(authorizationEntity, cancellationToken).ConfigureAwait(false);
 			}
 
 			return (new EmptyResult(), null);

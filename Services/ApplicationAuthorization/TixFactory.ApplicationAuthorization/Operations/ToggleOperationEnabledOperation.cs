@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
-	internal class ToggleOperationEnabledOperation : IOperation<ToggleOperationEnabledRequest, EmptyResult>
+	internal class ToggleOperationEnabledOperation : IAsyncOperation<ToggleOperationEnabledRequest, EmptyResult>
 	{
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IOperationEntityFactory _OperationEntityFactory;
@@ -15,7 +17,7 @@ namespace TixFactory.ApplicationAuthorization
 			_OperationEntityFactory = operationEntityFactory ?? throw new ArgumentNullException(nameof(operationEntityFactory));
 		}
 
-		public (EmptyResult output, OperationError error) Execute(ToggleOperationEnabledRequest request)
+		public async Task<(EmptyResult output, OperationError error)> Execute(ToggleOperationEnabledRequest request, CancellationToken cancellationToken)
 		{
 			var application = _ApplicationEntityFactory.GetApplicationByName(request.ApplicationName);
 			if (application == null)
@@ -23,7 +25,7 @@ namespace TixFactory.ApplicationAuthorization
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidApplicationName));
 			}
 
-			var operation = _OperationEntityFactory.GetOperationByName(application.Id, request.OperationName);
+			var operation = await _OperationEntityFactory.GetOperationByName(application.Id, request.OperationName, cancellationToken).ConfigureAwait(false);
 			if (operation == null)
 			{
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidOperationName));
@@ -32,7 +34,7 @@ namespace TixFactory.ApplicationAuthorization
 			if (operation.Enabled != request.Enabled)
 			{
 				operation.Enabled = request.Enabled;
-				_OperationEntityFactory.UpdateOperation(operation);
+				await _OperationEntityFactory.UpdateOperation(operation, cancellationToken).ConfigureAwait(false);
 			}
 
 			return (new EmptyResult(), null);

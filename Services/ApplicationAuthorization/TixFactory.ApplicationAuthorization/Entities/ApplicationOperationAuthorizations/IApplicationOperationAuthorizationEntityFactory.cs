@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace TixFactory.ApplicationAuthorization.Entities
 {
 	internal interface IApplicationOperationAuthorizationEntityFactory
 	{
-		ApplicationOperationAuthorization CreateApplicationOperationAuthorization(long applicationId, long operationId);
+		Task<ApplicationOperationAuthorization> CreateApplicationOperationAuthorization(long applicationId, long operationId, CancellationToken cancellationToken);
 
-		IReadOnlyCollection<ApplicationOperationAuthorization> GetApplicationOperationAuthorizationsByApplicationId(long applicationId);
+		Task<IReadOnlyCollection<ApplicationOperationAuthorization>> GetApplicationOperationAuthorizationsByApplicationId(long applicationId, CancellationToken cancellationToken);
 
-		IReadOnlyCollection<ApplicationOperationAuthorization> GetApplicationOperationAuthorizationsByOperationId(long operationId);
+		Task<IReadOnlyCollection<ApplicationOperationAuthorization>> GetApplicationOperationAuthorizationsByOperationId(long operationId, CancellationToken cancellationToken);
 
-		void UpdateApplicationOperationAuthorization(ApplicationOperationAuthorization applicationOperationAuthorization);
-
-		void DeleteApplicationOperationAuthorization(long id);
+		Task DeleteApplicationOperationAuthorization(ApplicationOperationAuthorization applicationOperationAuthorization, CancellationToken cancellationToken);
 	}
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using TixFactory.Collections;
 using TixFactory.Data.MySql;
@@ -24,66 +26,68 @@ namespace TixFactory.ApplicationAuthorization.Entities
 			_OperationsByApplicationId = new ExpirableDictionary<long, IReadOnlyCollection<Operation>>(_OperationsCacheTime, ExpirationPolicy.RenewOnWrite);
 		}
 
-		public Operation CreateOperation(long applicationId, string name)
+		public async Task<Operation> CreateOperation(long applicationId, string name, CancellationToken cancellationToken)
 		{
-			var operations = GetOperations(applicationId);
+			var operations = await GetOperations(applicationId, cancellationToken).ConfigureAwait(false);
 			if (operations.Count >= _OperationsMaxCount)
 			{
 				throw new ApplicationException($"Cannot create more than {_OperationsMaxCount} operations per application.");
 			}
 
-			var operationId = _DatabaseConnection.ExecuteInsertStoredProcedure<long>(_InsertOperationStoredProcedureName, new[]
+			var operationId = await _DatabaseConnection.ExecuteInsertStoredProcedureAsync<long>(_InsertOperationStoredProcedureName, new[]
 			{
 				new MySqlParameter("@_ApplicationID", applicationId),
 				new MySqlParameter("@_Name", name),
 				new MySqlParameter("@_Enabled", true)
-			});
+			}, cancellationToken).ConfigureAwait(false);
 
 			_OperationsByApplicationId.Remove(applicationId);
 
-			operations = GetOperations(applicationId);
+			operations = await GetOperations(applicationId, cancellationToken).ConfigureAwait(false);
 			return operations.First(o => o.Id == operationId);
 		}
 
-		public IReadOnlyCollection<Operation> GetOperations(long applicationId)
+		public async Task<IReadOnlyCollection<Operation>> GetOperations(long applicationId, CancellationToken cancellationToken)
 		{
 			if (_OperationsByApplicationId.TryGetValue(applicationId, out var operations))
 			{
 				return operations;
 			}
 
-			_OperationsByApplicationId[applicationId] = operations = _DatabaseConnection.ExecuteReadStoredProcedure<Operation>(_GetOperationsByApplicationIdStoredProcedureName, new[]
+			_OperationsByApplicationId[applicationId] = operations = await _DatabaseConnection.ExecuteReadStoredProcedureAsync<Operation>(_GetOperationsByApplicationIdStoredProcedureName, new[]
 			{
 				new MySqlParameter("@_ApplicationID", applicationId),
 				new MySqlParameter("@_Count", _OperationsMaxCount)
-			});
+			}, cancellationToken).ConfigureAwait(false);
 
 			return operations;
 		}
 
-		public Operation GetOperationByName(long applicationId, string name)
+		public async Task<Operation> GetOperationByName(long applicationId, string name, CancellationToken cancellationToken)
 		{
-			var operations = GetOperations(applicationId);
+			var operations = await GetOperations(applicationId, cancellationToken).ConfigureAwait(false);
 			return operations.FirstOrDefault(o => string.Equals(o.Name, name, StringComparison.OrdinalIgnoreCase));
 		}
 
-		public void UpdateOperation(Operation operation)
+		public async Task UpdateOperation(Operation operation, CancellationToken cancellationToken)
 		{
-			_DatabaseConnection.ExecuteWriteStoredProcedure(_UpdateOperationStoredProcedureName, new[]
+			await _DatabaseConnection.ExecuteWriteStoredProcedureAsync(_UpdateOperationStoredProcedureName, new[]
 			{
 				new MySqlParameter("@_ID", operation.Id),
 				new MySqlParameter("@_ApplicationID", operation.ApplicationId),
 				new MySqlParameter("@_Name", operation.Name),
 				new MySqlParameter("@_Enabled", operation.Enabled)
-			});
+			}, cancellationToken).ConfigureAwait(false);
 		}
 
-		public void DeleteOperation(long id)
+		public async Task DeleteOperation(Operation operation, CancellationToken cancellationToken)
 		{
-			_DatabaseConnection.ExecuteWriteStoredProcedure(_DeleteOperationStoredProcedureName, new[]
+			await _DatabaseConnection.ExecuteWriteStoredProcedureAsync(_DeleteOperationStoredProcedureName, new[]
 			{
-				new MySqlParameter("@_ID", id)
-			});
+				new MySqlParameter("@_ID", operation.Id)
+			}, cancellationToken).ConfigureAwait(false);
+
+			_OperationsByApplicationId.Remove(operation.ApplicationId);
 		}
 	}
 }

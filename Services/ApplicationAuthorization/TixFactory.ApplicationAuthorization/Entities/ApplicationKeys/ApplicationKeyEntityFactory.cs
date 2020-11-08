@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using TixFactory.Collections;
 using TixFactory.Data.MySql;
@@ -29,30 +31,30 @@ namespace TixFactory.ApplicationAuthorization.Entities
 			_ApplicationKeysByKeyHash = new ExpirableDictionary<string, ApplicationKey>(_ApplicationKeyCacheTime, ExpirationPolicy.RenewOnWrite);
 		}
 
-		public ApplicationKey CreateApplicationKey(long applicationId, string name, Guid key)
+		public async Task<ApplicationKey> CreateApplicationKey(long applicationId, string name, Guid key, CancellationToken cancellationToken)
 		{
-			var applicationKeys = GetApplicationKeysByApplicationId(applicationId);
+			var applicationKeys = await GetApplicationKeysByApplicationId(applicationId, cancellationToken).ConfigureAwait(false);
 			if (applicationKeys.Count >= _ApplicationKeysMaxCount)
 			{
 				throw new ApplicationException($"Cannot create more than {_ApplicationKeysMaxCount} application keys per application.");
 			}
 
 			var keyHash = _KeyHasher.HashKey(key);
-			var applicationKeyId = _DatabaseConnection.ExecuteInsertStoredProcedure<long>(_InsertApplicationKeyStoredProcedure, new[]
+			var applicationKeyId = await _DatabaseConnection.ExecuteInsertStoredProcedureAsync<long>(_InsertApplicationKeyStoredProcedure, new[]
 			{
 				new MySqlParameter("@_ApplicationID", applicationId),
 				new MySqlParameter("@_Name", name),
 				new MySqlParameter("@_KeyHash", keyHash),
 				new MySqlParameter("@_Enabled", true)
-			});
+			}, cancellationToken).ConfigureAwait(false);
 
 			_ApplicationKeysByApplicationId.Remove(applicationId);
 
-			applicationKeys = GetApplicationKeysByApplicationId(applicationId);
+			applicationKeys = await GetApplicationKeysByApplicationId(applicationId, cancellationToken).ConfigureAwait(false);
 			return applicationKeys.First(k => k.Id == applicationKeyId);
 		}
 
-		public ApplicationKey GetApplicationKey(Guid key)
+		public async Task<ApplicationKey> GetApplicationKey(Guid key, CancellationToken cancellationToken)
 		{
 			var keyHash = _KeyHasher.HashKey(key);
 			if (_ApplicationKeysByKeyHash.TryGetValue(keyHash, out var applicaitonKey))
@@ -60,55 +62,58 @@ namespace TixFactory.ApplicationAuthorization.Entities
 				return applicaitonKey;
 			}
 
-			var applicationKeys = _DatabaseConnection.ExecuteReadStoredProcedure<ApplicationKey>(_GetApplicationKeyByKeyHashStoredProcedureName, new[]
+			var applicationKeys = await _DatabaseConnection.ExecuteReadStoredProcedureAsync<ApplicationKey>(_GetApplicationKeyByKeyHashStoredProcedureName, new[]
 			{
 				new MySqlParameter("@_KeyHash", keyHash)
-			});
+			}, cancellationToken).ConfigureAwait(false);
 
 			_ApplicationKeysByKeyHash[keyHash] = applicaitonKey = applicationKeys.FirstOrDefault();
 			return applicaitonKey;
 		}
 
-		public ApplicationKey GetApplicationKeyByApplicationIdAndName(long applicationId, string name)
+		public async Task<ApplicationKey> GetApplicationKeyByApplicationIdAndName(long applicationId, string name, CancellationToken cancellationToken)
 		{
-			var applicationKeys = GetApplicationKeysByApplicationId(applicationId);
+			var applicationKeys = await GetApplicationKeysByApplicationId(applicationId, cancellationToken).ConfigureAwait(false);
 			return applicationKeys.FirstOrDefault(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase));
 		}
 
-		public IReadOnlyCollection<ApplicationKey> GetApplicationKeysByApplicationId(long applicationId)
+		public async Task<IReadOnlyCollection<ApplicationKey>> GetApplicationKeysByApplicationId(long applicationId, CancellationToken cancellationToken)
 		{
 			if (_ApplicationKeysByApplicationId.TryGetValue(applicationId, out var applicationKeys))
 			{
 				return applicationKeys;
 			}
 
-			applicationKeys = _ApplicationKeysByApplicationId[applicationId] = _DatabaseConnection.ExecuteReadStoredProcedure<ApplicationKey>(_GetApplicationKeysByApplicationIdStoredProcedureName, new[]
+			applicationKeys = _ApplicationKeysByApplicationId[applicationId] = await _DatabaseConnection.ExecuteReadStoredProcedureAsync<ApplicationKey>(_GetApplicationKeysByApplicationIdStoredProcedureName, new[]
 			{
 				new MySqlParameter("@_ApplicationID", applicationId),
 				new MySqlParameter("@_Count", _ApplicationKeysMaxCount)
-			});
+			}, cancellationToken).ConfigureAwait(false);
 
 			return applicationKeys;
 		}
 
-		public void UpdateApplicationKey(ApplicationKey applicationKey)
+		public Task UpdateApplicationKey(ApplicationKey applicationKey, CancellationToken cancellationToken)
 		{
-			_DatabaseConnection.ExecuteWriteStoredProcedure(_UpdateApplicationKeyStoredProcedureName, new[]
+			return _DatabaseConnection.ExecuteWriteStoredProcedureAsync(_UpdateApplicationKeyStoredProcedureName, new[]
 			{
 				new MySqlParameter("@_ID", applicationKey.Id),
 				new MySqlParameter("@_ApplicationID", applicationKey.ApplicationId),
 				new MySqlParameter("@_Name", applicationKey.Name),
 				new MySqlParameter("@_KeyHash", applicationKey.KeyHash),
 				new MySqlParameter("@_Enabled", applicationKey.Enabled)
-			});
+			}, cancellationToken);
 		}
 
-		public void DeleteApplicationKey(long id)
+		public async Task DeleteApplicationKey(ApplicationKey applicationKey, CancellationToken cancellationToken)
 		{
-			_DatabaseConnection.ExecuteWriteStoredProcedure(_DeleteApplicationKeyStoredProcedureName, new[]
+			await _DatabaseConnection.ExecuteWriteStoredProcedureAsync(_DeleteApplicationKeyStoredProcedureName, new[]
 			{
-				new MySqlParameter("@_ID", id)
-			});
+				new MySqlParameter("@_ID", applicationKey.Id)
+			}, cancellationToken).ConfigureAwait(false);
+
+			_ApplicationKeysByApplicationId.Remove(applicationKey.ApplicationId);
+			_ApplicationKeysByKeyHash.Remove(applicationKey.KeyHash);
 		}
 	}
 }

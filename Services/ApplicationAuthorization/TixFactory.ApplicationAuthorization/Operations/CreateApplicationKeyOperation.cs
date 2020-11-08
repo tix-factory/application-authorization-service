@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
-	internal class CreateApplicationKeyOperation : IOperation<CreateApplicationKeyRequest, Guid>
+	internal class CreateApplicationKeyOperation : IAsyncOperation<CreateApplicationKeyRequest, Guid>
 	{
 		private const int _MaxNameLength = 50;
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
@@ -16,7 +18,7 @@ namespace TixFactory.ApplicationAuthorization
 			_ApplicationKeyEntityFactory = applicationKeyEntityFactory ?? throw new ArgumentNullException(nameof(applicationKeyEntityFactory));
 		}
 
-		public (Guid output, OperationError error) Execute(CreateApplicationKeyRequest request)
+		public async Task<(Guid output, OperationError error)> Execute(CreateApplicationKeyRequest request, CancellationToken cancellationToken)
 		{
 			var application = _ApplicationEntityFactory.GetApplicationByName(request.ApplicationName);
 			if (application == null)
@@ -29,14 +31,14 @@ namespace TixFactory.ApplicationAuthorization
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidKeyName));
 			}
 
-			var applicationKey = _ApplicationKeyEntityFactory.GetApplicationKeyByApplicationIdAndName(application.Id, request.KeyName);
+			var applicationKey = await _ApplicationKeyEntityFactory.GetApplicationKeyByApplicationIdAndName(application.Id, request.KeyName, cancellationToken).ConfigureAwait(false);
 			if (applicationKey != null)
 			{
 				return (default, new OperationError(ApplicationAuthorizationError.InvalidKeyName));
 			}
 
 			var key = Guid.NewGuid();
-			_ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, request.KeyName, key);
+			await _ApplicationKeyEntityFactory.CreateApplicationKey(application.Id, request.KeyName, key, cancellationToken).ConfigureAwait(false);
 
 			return (key, null);
 		}

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
-	internal class RegisterOperationOperation : IOperation<RegisterOperationRequest, EmptyResult>
+	internal class RegisterOperationOperation : IAsyncOperation<RegisterOperationRequest, EmptyResult>
 	{
 		private const int _MaxNameLength = 50;
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
@@ -16,7 +18,7 @@ namespace TixFactory.ApplicationAuthorization
 			_OperationEntityFactory = operationEntityFactory ?? throw new ArgumentNullException(nameof(operationEntityFactory));
 		}
 
-		public (EmptyResult output, OperationError error) Execute(RegisterOperationRequest request)
+		public async Task<(EmptyResult output, OperationError error)> Execute(RegisterOperationRequest request, CancellationToken cancellationToken)
 		{
 			if (string.IsNullOrWhiteSpace(request?.OperationName) || request.OperationName.Length > _MaxNameLength)
 			{

@@ -26,25 +26,25 @@ namespace TixFactory.ApplicationAuthorization
 
 		public IApplicationKeyValidator ApplicationKeyValidator { get; }
 
-		public IOperation<string, ApplicationResult> GetApplicationOperation { get; }
+		public IAsyncOperation<string, ApplicationResult> GetApplicationOperation { get; }
 
-		public IOperation<RegisterApplicationRequest, EmptyResult> RegisterApplicationOperation { get; }
+		public IAsyncOperation<RegisterApplicationRequest, EmptyResult> RegisterApplicationOperation { get; }
 
-		public IOperation<RegisterOperationRequest, EmptyResult> RegisterOperationOperation { get; }
+		public IAsyncOperation<RegisterOperationRequest, EmptyResult> RegisterOperationOperation { get; }
 
-		public IOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
+		public IAsyncOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
 
-		public IOperation<CreateApplicationKeyRequest, Guid> CreateApplicationKeyOperation { get; }
+		public IAsyncOperation<CreateApplicationKeyRequest, Guid> CreateApplicationKeyOperation { get; }
 
-		public IOperation<DeleteApplicationKeyRequest, EmptyResult> DeleteApplicationKeyOperation { get; }
+		public IAsyncOperation<DeleteApplicationKeyRequest, EmptyResult> DeleteApplicationKeyOperation { get; }
 
-		public IOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
+		public IAsyncOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
 
-		public IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
+		public IAsyncOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 
-		public IOperation<ToggleOperationAuthorizationRequest, EmptyResult> ToggleOperationAuthorizationOperation { get; }
+		public IAsyncOperation<ToggleOperationAuthorizationRequest, EmptyResult> ToggleOperationAuthorizationOperation { get; }
 
-		public IOperation<Guid, WhoAmIResult> WhoAmIOperation { get; }
+		public IAsyncOperation<Guid, WhoAmIResult> WhoAmIOperation { get; }
 
 		public ApplicationAuthorizationOperations(ILogger logger, IApplicationContext applicationContext)
 		{
@@ -54,7 +54,7 @@ namespace TixFactory.ApplicationAuthorization
 
 			var keyHasher = new KeyHasher();
 			var connectionString = new Setting<string>(Environment.GetEnvironmentVariable("APPLICATION_AUTHORIZATIONS_CONNECTION_STRING"));
-			var databaseConnection = new DatabaseConnection(connectionString);
+			var databaseConnection = new DatabaseConnection(connectionString, logger);
 			var applicationEntityFactory = _ApplicationEntityFactory = new ApplicationEntityFactory(databaseConnection);
 			var operationEntityFactory = _OperationEntityFactory = new OperationEntityFactory(databaseConnection);
 			var applicationKeyEntityFactory = _ApplicationKeyEntityFactory = new ApplicationKeyEntityFactory(databaseConnection, keyHasher);

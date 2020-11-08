@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
-	internal class ToggleOperationAuthorizationOperation : IOperation<ToggleOperationAuthorizationRequest, EmptyResult>
+	internal class ToggleOperationAuthorizationOperation : IAsyncOperation<ToggleOperationAuthorizationRequest, EmptyResult>
 	{
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IOperationEntityFactory _OperationEntityFactory;
@@ -21,7 +23,7 @@ namespace TixFactory.ApplicationAuthorization
 			_ApplicationOperationAuthorizationEntityFactory = applicationOperationAuthorizationEntityFactory ?? throw new ArgumentNullException(nameof(applicationOperationAuthorizationEntityFactory));
 		}
 
-		public (EmptyResult output, OperationError error) Execute(ToggleOperationAuthorizationRequest request)
+		public async Task<(EmptyResult output, OperationError error)> Execute(ToggleOperationAuthorizationRequest request, CancellationToken cancellationToken)
 		{
 			var application = _ApplicationEntityFactory.GetApplicationByName(request.ApplicationName);
 			if (application == null)

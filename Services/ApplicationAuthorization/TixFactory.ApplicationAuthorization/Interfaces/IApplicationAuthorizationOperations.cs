@@ -8,24 +8,24 @@ namespace TixFactory.ApplicationAuthorization
 	{
 		IApplicationKeyValidator ApplicationKeyValidator { get; }
 
-		IOperation<string, ApplicationResult> GetApplicationOperation { get; }
+		IAsyncOperation<string, ApplicationResult> GetApplicationOperation { get; }
 
-		IOperation<RegisterApplicationRequest, EmptyResult> RegisterApplicationOperation { get; }
+		IAsyncOperation<RegisterApplicationRequest, EmptyResult> RegisterApplicationOperation { get; }
 
-		IOperation<RegisterOperationRequest, EmptyResult> RegisterOperationOperation { get; }
+		IAsyncOperation<RegisterOperationRequest, EmptyResult> RegisterOperationOperation { get; }
 
-		IOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
+		IAsyncOperation<ToggleOperationEnabledRequest, EmptyResult> ToggleOperationEnabledOperation { get; }
 
-		IOperation<CreateApplicationKeyRequest, Guid> CreateApplicationKeyOperation { get; }
+		IAsyncOperation<CreateApplicationKeyRequest, Guid> CreateApplicationKeyOperation { get; }
 
-		IOperation<DeleteApplicationKeyRequest, EmptyResult> DeleteApplicationKeyOperation { get; }
+		IAsyncOperation<DeleteApplicationKeyRequest, EmptyResult> DeleteApplicationKeyOperation { get; }
 
-		IOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
+		IAsyncOperation<ToggleApplicationKeyEnabledRequest, EmptyResult> ToggleApplicationKeyEnabledOperation { get; }
 
-		IOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
+		IAsyncOperation<GetAuthorizedOperationsRequest, ICollection<string>> GetAuthorizedOperationsOperation { get; }
 
-		IOperation<ToggleOperationAuthorizationRequest, EmptyResult> ToggleOperationAuthorizationOperation { get; }
+		IAsyncOperation<ToggleOperationAuthorizationRequest, EmptyResult> ToggleOperationAuthorizationOperation { get; }
 
-		IOperation<Guid, WhoAmIResult> WhoAmIOperation { get; }
+		IAsyncOperation<Guid, WhoAmIResult> WhoAmIOperation { get; }
 	}
 }

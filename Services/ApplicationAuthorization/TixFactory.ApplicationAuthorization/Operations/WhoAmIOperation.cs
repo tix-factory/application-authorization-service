@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
-	internal class WhoAmIOperation : IOperation<Guid, WhoAmIResult>
+	internal class WhoAmIOperation : IAsyncOperation<Guid, WhoAmIResult>
 	{
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IApplicationKeyEntityFactory _ApplicationKeyEntityFactory;
@@ -17,7 +19,7 @@ namespace TixFactory.ApplicationAuthorization
 			_ApplicationKeyEntityFactory = applicationKeyEntityFactory ?? throw new ArgumentNullException(nameof(applicationKeyEntityFactory));
 		}
 
-		public (WhoAmIResult output, OperationError error) Execute(Guid applicationKey)
+		public async Task<(WhoAmIResult output, OperationError error)> Execute(Guid applicationKey, CancellationToken cancellationToken)
 		{
 			var targetApplicationKey = _ApplicationKeyEntityFactory.GetApplicationKey(applicationKey);
 			if (targetApplicationKey == null || !targetApplicationKey.Enabled)

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TixFactory.Http.Service;
@@ -19,50 +21,50 @@ namespace TixFactory.ApplicationAuthorization.Service.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult GetApplication([FromBody] RequestPayload<string> request)
+		public Task<IActionResult> GetApplication([FromBody] RequestPayload<string> request, CancellationToken cancellationToken)
 		{
-			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.GetApplicationOperation, request.Data);
+			return _OperationExecuter.ExecuteAsync(_ApplicationAuthorizationOperations.GetApplicationOperation, request.Data, cancellationToken);
 		}
 
 		[HttpPost]
-		public IActionResult RegisterApplication([FromBody] RegisterApplicationRequest request)
+		public Task<IActionResult> RegisterApplication([FromBody] RegisterApplicationRequest request, CancellationToken cancellationToken)
 		{
-			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.RegisterApplicationOperation, request);
+			return _OperationExecuter.ExecuteAsync(_ApplicationAuthorizationOperations.RegisterApplicationOperation, request, cancellationToken);
 		}
 
 		[HttpPost]
-		public IActionResult RegisterOperation([FromBody] RegisterOperationRequest request)
+		public Task<IActionResult> RegisterOperation([FromBody] RegisterOperationRequest request, CancellationToken cancellationToken)
 		{
-			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.RegisterOperationOperation, request);
+			return _OperationExecuter.ExecuteAsync(_ApplicationAuthorizationOperations.RegisterOperationOperation, request, cancellationToken);
 		}
 
 		[HttpPost]
-		public IActionResult ToggleOperationEnabled([FromBody] ToggleOperationEnabledRequest request)
+		public Task<IActionResult> ToggleOperationEnabled([FromBody] ToggleOperationEnabledRequest request, CancellationToken cancellationToken)
 		{
-			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.ToggleOperationEnabledOperation, request);
+			return _OperationExecuter.ExecuteAsync(_ApplicationAuthorizationOperations.ToggleOperationEnabledOperation, request, cancellationToken);
 		}
 
 		[HttpPost]
-		public IActionResult CreateApplicationKey([FromBody] CreateApplicationKeyRequest request)
+		public Task<IActionResult> CreateApplicationKey([FromBody] CreateApplicationKeyRequest request, CancellationToken cancellationToken)
 		{
-			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.CreateApplicationKeyOperation, request);
+			return _OperationExecuter.ExecuteAsync(_ApplicationAuthorizationOperations.CreateApplicationKeyOperation, request, cancellationToken);
 		}
 
 		[HttpPost]
-		public IActionResult DeleteApplicationKey([FromBody] DeleteApplicationKeyRequest request)
+		public Task<IActionResult> DeleteApplicationKey([FromBody] DeleteApplicationKeyRequest request, CancellationToken cancellationToken)
 		{
-			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.DeleteApplicationKeyOperation, request);
+			return _OperationExecuter.ExecuteAsync(_ApplicationAuthorizationOperations.DeleteApplicationKeyOperation, request, cancellationToken);
 		}
 
 		[HttpPost]
-		public IActionResult ToggleApplicationKeyEnabled([FromBody] ToggleApplicationKeyEnabledRequest request)
+		public Task<IActionResult> ToggleApplicationKeyEnabled([FromBody] ToggleApplicationKeyEnabledRequest request, CancellationToken cancellationToken)
 		{
-			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.ToggleApplicationKeyEnabledOperation, request);
+			return _OperationExecuter.ExecuteAsync(_ApplicationAuthorizationOperations.ToggleApplicationKeyEnabledOperation, request, cancellationToken);
 		}
 
 		[HttpPost]
 		[AllowAnonymous]
-		public IActionResult GetAuthorizedOperations([FromBody] GetAuthorizedOperationsRequest request)
+		public Task<IActionResult> GetAuthorizedOperations([FromBody] GetAuthorizedOperationsRequest request, CancellationToken cancellationToken)
 		{
 			if (Request.Headers.TryGetValue(_ApiKeyHeaderName, out var rawApiKey) && Guid.TryParse(rawApiKey, out var apiKey))
 			{
@@ -73,20 +75,20 @@ namespace TixFactory.ApplicationAuthorization.Service.Controllers
 				request.TargetApplicationKey = default;
 			}
 
-			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.GetAuthorizedOperationsOperation, request);
+			return _OperationExecuter.ExecuteAsync(_ApplicationAuthorizationOperations.GetAuthorizedOperationsOperation, request, cancellationToken);
 		}
 
 		[HttpPost]
-		public IActionResult ToggleOperationAuthorization([FromBody] ToggleOperationAuthorizationRequest request)
+		public Task<IActionResult> ToggleOperationAuthorization([FromBody] ToggleOperationAuthorizationRequest request, CancellationToken cancellationToken)
 		{
-			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.ToggleOperationAuthorizationOperation, request);
+			return _OperationExecuter.ExecuteAsync(_ApplicationAuthorizationOperations.ToggleOperationAuthorizationOperation, request, cancellationToken);
 		}
 
 		[HttpPost]
 		[AllowAnonymous]
-		public IActionResult WhoAmI([FromHeader(Name = _ApiKeyHeaderName)] Guid apiKey)
+		public Task<IActionResult> WhoAmI([FromHeader(Name = _ApiKeyHeaderName)] Guid apiKey, CancellationToken cancellationToken)
 		{
-			return _OperationExecuter.Execute(_ApplicationAuthorizationOperations.WhoAmIOperation, apiKey);
+			return _OperationExecuter.ExecuteAsync(_ApplicationAuthorizationOperations.WhoAmIOperation, apiKey, cancellationToken);
 		}
 	}
 }

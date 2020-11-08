@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationAuthorization.Entities;
 using TixFactory.Operations;
 
 namespace TixFactory.ApplicationAuthorization
 {
-	internal class ToggleApplicationKeyEnabledOperation : IOperation<ToggleApplicationKeyEnabledRequest, EmptyResult>
+	internal class ToggleApplicationKeyEnabledOperation : IAsyncOperation<ToggleApplicationKeyEnabledRequest, EmptyResult>
 	{
 		private readonly IApplicationEntityFactory _ApplicationEntityFactory;
 		private readonly IApplicationKeyEntityFactory _ApplicationKeyEntityFactory;
@@ -15,7 +17,7 @@ namespace TixFactory.ApplicationAuthorization
 			_ApplicationKeyEntityFactory = applicationKeyEntityFactory ?? throw new ArgumentNullException(nameof(applicationKeyEntityFactory));
 		}
 
-		public (EmptyResult output, OperationError error) Execute(ToggleApplicationKeyEnabledRequest request)
+		public async Task<(EmptyResult output, OperationError error)> Execute(ToggleApplicationKeyEnabledRequest request, CancellationToken cancellationToken)
 		{
 			var application = _ApplicationEntityFactory.GetApplicationByName(request.ApplicationName);
 			if (application == null)

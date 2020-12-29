@@ -59,7 +59,12 @@ export default class {
 		});
 	}
 
-	async getAuthorizedOperationsByApplication(application) {
+	async getAuthorizedOperationsByApplicationName(applicationName) {
+		const application = await this.applicationEntityFactory.getApplicationByName(applicationName);
+		if (!application) {
+			return Promise.resolve([]);
+		}
+
 		const authorizationEntities = await this.applicationOperationAuthorizationsCollection.find({
 			applicationId: application.id
 		});
@@ -73,6 +78,6 @@ export default class {
 			});
 		}));
 
-		return Promise.resolve(operation);
+		return Promise.resolve(operations);
 	}
 };

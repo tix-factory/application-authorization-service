@@ -12,9 +12,9 @@ import ApplicationOperationAuthorizationEntityFactory from "./entities/applicati
 import AuthorizationHandler from "./implementation/authorizationHandler.js";
 import KeyHasher from "./implementation/keyHasher.js";
 
+import GetAuthorizedOperationsOperation from "./operations/GetAuthorizedOperationsOperation.js";
 /*
 import DeleteApplicationSettingOperation from "./operations/DeleteApplicationSettingOperation.js";
-import GetApplicationSettingsOperation from "./operations/GetApplicationSettingsOperation.js";
 import SetApplicationSettingOperation from "./operations/SetApplicationSettingOperation.js";
 import SetApplicationSettingValueOperation from "./operations/SetApplicationSettingValueOperation.js";
 */
@@ -86,8 +86,6 @@ const init = () => {
 			const applicationKeyEntityFactory = new ApplicationKeyEntityFactory(applicationEntityFactory, applicationKeysCollection, keyHasher);
 			const operationEntityFactory = new OperationEntityFactory(operationsCollection, applicationEntityFactory);
 			const applicationOperationAuthorizationEntityFactory = new ApplicationOperationAuthorizationEntityFactory(applicationOperationAuthorizationsCollection, applicationEntityFactory, operationEntityFactory);
-			
-			const authorizationHandler = service.authorizationHandler = new AuthorizationHandler(service.logger);
 
 			await Promise.all([
 				applicationEntityFactory.setup(),
@@ -96,9 +94,11 @@ const init = () => {
 				applicationOperationAuthorizationEntityFactory.setup()
 			]);
 			
+			const authorizationHandler = service.authorizationHandler = new AuthorizationHandler(service.logger, service.options.name, applicationEntityFactory, applicationKeyEntityFactory, applicationOperationAuthorizationEntityFactory);
+			
+			service.operationRegistry.registerOperation(new GetAuthorizedOperationsOperation(service.logger, authorizationHandler, applicationEntityFactory, applicationKeyEntityFactory));
 			/*
 			service.operationRegistry.registerOperation(new DeleteApplicationSettingOperation(settingEntityFactory));
-			service.operationRegistry.registerOperation(new GetApplicationSettingsOperation(settingEntityFactory, applicationNameProvider));
 			service.operationRegistry.registerOperation(new SetApplicationSettingOperation(settingEntityFactory));
 			service.operationRegistry.registerOperation(new SetApplicationSettingValueOperation(settingEntityFactory, applicationNameProvider));
 			*/

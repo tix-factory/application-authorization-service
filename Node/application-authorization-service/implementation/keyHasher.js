@@ -1,7 +1,7 @@
 import crypto from "crypto";
+import { validate as isGuid } from "uuid";
 
 const CacheExpiry = 10 * 60 * 1000;
-const GuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const guidToBytes = guid => {
 	// https://gist.github.com/daboxu/4f1dd0a254326ac2361f8e78f89e97ae
@@ -20,10 +20,10 @@ export default class {
 	}
 
 	validate(guid) {
-		return guid && GuidRegex.test(guid);
+		return isGuid(guid);
 	}
 
-	async hash(guid) {
+	hash(guid) {
 		if (!this.validate(guid)) {
 			return Promise.reject(new Error(`guid input is not guid format`));
 		}

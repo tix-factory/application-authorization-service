@@ -1,11 +1,9 @@
-import { HttpRequest, HttpHandler, HttpRequestError, httpMethods } from "@tix-factory/http";
-const GuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+import { validate as isGuid } from "uuid";
+
 const CacheExpiryInMilliseconds = 60 * 1000;
 
-export default class extends HttpHandler {
+export default class {
 	constructor(logger) {
-		super();
-
 		this.logger = logger;
 		this.cache = {};
 	}
@@ -27,7 +25,7 @@ export default class extends HttpHandler {
 	}
 
 	getAuthorizedOperations(apiKey) {
-		if (!apiKey || !GuidRegex.test(apiKey)) {
+		if (!isGuid(apiKey)) {
 			return Promise.resolve([]);
 		}
 

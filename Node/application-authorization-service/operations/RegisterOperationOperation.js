@@ -4,7 +4,7 @@ export default class {
 	}
 
     get name() {
-        return "RegisterApplication";
+        return "RegisterOperation";
     }
 	
 	get requestParameters() {

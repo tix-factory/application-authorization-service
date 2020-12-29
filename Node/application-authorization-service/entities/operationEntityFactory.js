@@ -45,7 +45,8 @@ export default class {
 
 		const operationId = await this.operationsCollection.insert({
 			applicationId: application.id,
-			name: operationName
+			name: operationName,
+			enabled: true
 		});
 
 		return this.operationsCollection.findOne({

@@ -5,7 +5,7 @@ const isApplicationKeyNameValid = (applicationKeyName) => {
 		return false;
 	}
 
-	return applicationName && applicationName.length <= MaxApplicationKeyNameLength;
+	return applicationKeyName && applicationKeyName.length <= MaxApplicationKeyNameLength;
 };
 
 export default class {
@@ -88,6 +88,19 @@ export default class {
 		}, {
 			// This lookup is case-sensitive.
 			collation: undefined
+		});
+	}
+
+	async toggleApplicationKeyEnabled(applicationName, applicationKeyName, enabled) {
+		const applicationKey = await this.getApplicationKeyByApplicationNameAndKeyName(applicationName, applicationKeyName);
+		if (!applicationKey) {
+			return Promise.reject("InvalidKeyName");
+		}
+
+		return this.applicationKeysCollection.updateOne({
+			id: applicationKey.id
+		}, {
+			enabled: enabled === true
 		});
 	}
 };

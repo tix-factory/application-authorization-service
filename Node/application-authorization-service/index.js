@@ -12,6 +12,7 @@ import ApplicationOperationAuthorizationEntityFactory from "./entities/applicati
 import AuthorizationHandler from "./implementation/authorizationHandler.js";
 import KeyHasher from "./implementation/keyHasher.js";
 
+import CreateApplicationKeyOperation from "./operations/CreateApplicationKeyOperation.js";
 import GetApplicationOperation from "./operations/GetApplicationOperation.js";
 import GetAuthorizedOperationsOperation from "./operations/GetAuthorizedOperationsOperation.js";
 import RegisterApplicationOperation from "./operations/RegisterApplicationOperation.js";
@@ -95,6 +96,7 @@ const init = () => {
 			
 			const authorizationHandler = service.authorizationHandler = new AuthorizationHandler(service.logger, service.options.name, applicationEntityFactory, applicationKeyEntityFactory, applicationOperationAuthorizationEntityFactory);
 			
+			service.operationRegistry.registerOperation(new CreateApplicationKeyOperation(applicationKeyEntityFactory));
 			service.operationRegistry.registerOperation(new GetApplicationOperation(applicationEntityFactory, operationEntityFactory));
 			service.operationRegistry.registerOperation(new GetAuthorizedOperationsOperation(service.logger, authorizationHandler, applicationEntityFactory, applicationKeyEntityFactory));
 			service.operationRegistry.registerOperation(new RegisterApplicationOperation(applicationEntityFactory));

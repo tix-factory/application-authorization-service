@@ -84,6 +84,8 @@ export default class {
 				if (!apiKeyApplication) {
 					this.logger.warn("Valid ApiKey does not map to valid application.",
 						"\n\tKey:", applicationKey.name, `(${applicationKey.id})`);
+					resolve([]);
+					return;
 				}
 
 				const authorizedOperations = await this.applicationOperationAuthorizationEntityFactory.getAuthorizedOperationsByApplicationName(apiKeyApplication.name);

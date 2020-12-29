@@ -14,6 +14,7 @@ import KeyHasher from "./implementation/keyHasher.js";
 
 import GetAuthorizedOperationsOperation from "./operations/GetAuthorizedOperationsOperation.js";
 import RegisterApplicationOperation from "./operations/RegisterApplicationOperation.js";
+import RegisterOperationOperation from "./operations/RegisterOperationOperation.js";
 import WhoAmIOperation from "./operations/WhoAmIOperation.js";
 
 const setupKeyName = "Application Setup";
@@ -95,6 +96,7 @@ const init = () => {
 			
 			service.operationRegistry.registerOperation(new GetAuthorizedOperationsOperation(service.logger, authorizationHandler, applicationEntityFactory, applicationKeyEntityFactory));
 			service.operationRegistry.registerOperation(new RegisterApplicationOperation(applicationEntityFactory));
+			service.operationRegistry.registerOperation(new RegisterOperationOperation(operationEntityFactory));
 			service.operationRegistry.registerOperation(new WhoAmIOperation(service.logger, applicationEntityFactory, applicationKeyEntityFactory));
 
 			const runningApplication = await registerApplication(applicationEntityFactory, operationEntityFactory, applicationOperationAuthorizationEntityFactory, service.operationRegistry);

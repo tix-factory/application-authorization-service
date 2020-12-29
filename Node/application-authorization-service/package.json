@@ -1,0 +1,27 @@
+{
+  "name": "application-authorization-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tix-factory/application-authorization-service.git"
+  },
+  "keywords": [
+    "authorizations"
+  ],
+  "author": "webgl3d",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tix-factory/application-authorization-service/issues"
+  },
+  "homepage": "https://github.com/tix-factory/application-authorization-service#readme",
+  "dependencies": {
+    "@tix-factory/http": "^2.0.114",
+    "@tix-factory/http-service": "^2.0.114",
+    "@tix-factory/mongodb": "^2.0.114",
+    "uuid": "^8.3.2"
+  }
+}
